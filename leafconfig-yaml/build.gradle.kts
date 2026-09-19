@@ -1,20 +1,6 @@
-plugins {
-    id("java")
-}
-
-group = "io.github.itzhiti"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
+description = "LeafConfig YAML backend: schema discovery, codecs, merge, persistence"
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:6.0.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-tasks.test {
-    useJUnitPlatform()
+    api(project(":leafconfig-api"))
+    implementation(libs.snakeyaml.engine)
 }

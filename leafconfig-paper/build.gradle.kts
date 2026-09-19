@@ -1,20 +1,11 @@
-plugins {
-    id("java")
-}
-
-group = "io.github.itzhiti"
-version = "1.0-SNAPSHOT"
+description = "LeafConfig Paper integration and Paper/Adventure codecs"
 
 repositories {
-    mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:6.0.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-tasks.test {
-    useJUnitPlatform()
+    api(project(":leafconfig-yaml"))
+    compileOnly(libs.paper.api)
+    testImplementation(libs.paper.api)
 }

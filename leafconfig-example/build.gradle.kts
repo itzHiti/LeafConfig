@@ -1,20 +1,34 @@
 plugins {
-    id("java")
+    alias(libs.plugins.shadow)
 }
 
-group = "io.github.itzhiti"
-version = "1.0-SNAPSHOT"
+description = "Minimal Paper plugin demonstrating LeafConfig"
 
 repositories {
-    mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:6.0.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation(project(":leafconfig-paper"))
+    compileOnly(libs.paper.api)
 }
 
-tasks.test {
-    useJUnitPlatform()
+tasks.processResources {
+    val props = mapOf("version" to project.version.toString())
+    inputs.properties(props)
+    filesMatching("plugin.yml") { expand(props) }
 }
+
+tasks.shadowJar {
+    archiveClassifier.set("")
+    relocate("dev.leafconfig", "dev.leafconfig.example.libs.leafconfig")
+    relocate("org.snakeyaml.engine", "dev.leafconfig.example.libs.snakeyaml")
+}
+
+tasks.assemble {
+    dependsOn(tasks.shadowJar)
+}
+
+tasks.withType<Javadoc>().configureEach { enabled = false }
+tasks.named<Jar>("javadocJar") { enabled = false }
+tasks.named<Jar>("sourcesJar") { enabled = false }
