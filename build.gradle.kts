@@ -57,6 +57,11 @@ subprojects {
         options.errorprone.disableWarningsInGeneratedCode.set(true)
     }
 
+    tasks.named<JavaCompile>("compileTestJava") {
+        // Test configuration models are read reflectively; the check cannot see that.
+        options.errorprone.disable("UnusedVariable")
+    }
+
     tasks.withType<Javadoc>().configureEach {
         options.encoding = "UTF-8"
         (options as StandardJavadocDocletOptions).addBooleanOption("Xdoclint:all,-missing", true)

@@ -1,0 +1,27 @@
+# Enable debug output
+debug: true
+# Maximum number of players
+# Must be between 1 and 200
+max-players: 50
+# Greeting shown on join
+motd: Hi
+worlds:
+  - world
+  - world_nether
+modes:
+  - SURVIVAL
+  - CREATIVE
+limits:
+  default: 10
+# Database settings
+database:
+  # Host name of the database server
+  host: localhost
+  port: 5432
+  tags: []
+  options: {}
+nullable: null
+timeout: 1m30s
+owner: 123e4567-e89b-12d3-a456-426614174000
+ratio: 0.75
+price: 19.99

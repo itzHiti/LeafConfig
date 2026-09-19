@@ -1,0 +1,35 @@
+# My server config
+# Enable debug output
+debug: true
+# Maximum number of players
+# Must be between 1 and 200
+max-players: 150 # raised for the event
+# Greeting shown on join
+motd: "0042"
+worlds:
+  - world
+  - 'quoted_world'
+modes:
+  - creative
+limits:
+  default: 5
+  vip: 20
+# Database settings
+database:
+  # Host name of the database server
+  host: db.example.org
+  port: 3306
+  tags:
+    - primary
+  options:
+    ssl: "true"
+nullable: null
+timeout: 2h
+owner: 00000000-0000-0000-0000-000000000001
+ratio: 0.5
+price: 9.99
+custom-plugin-key: keep me
+banner: |
+  line one
+  line two
+# end of file

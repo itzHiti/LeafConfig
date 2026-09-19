@@ -1,0 +1,4 @@
+debug: false
+database:
+  host: remote
+extra: 1
