@@ -2,3 +2,4 @@
 *.bat text eol=crlf
 *.jar binary
 gradlew text eol=lf
+leafconfig-yaml/src/test/resources/golden/** -text
