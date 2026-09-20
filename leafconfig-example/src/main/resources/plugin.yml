@@ -3,3 +3,11 @@ version: "${version}"
 main: dev.leafconfig.example.ExamplePlugin
 api-version: "1.21"
 description: Minimal plugin demonstrating LeafConfig
+commands:
+  leafconfigexample:
+    description: Reload the example configuration
+    usage: /<command> reload
+    permission: leafconfigexample.reload
+permissions:
+  leafconfigexample.reload:
+    default: op

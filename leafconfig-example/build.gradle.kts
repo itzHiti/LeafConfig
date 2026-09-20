@@ -32,3 +32,7 @@ tasks.assemble {
 tasks.withType<Javadoc>().configureEach { enabled = false }
 tasks.named<Jar>("javadocJar") { enabled = false }
 tasks.named<Jar>("sourcesJar") { enabled = false }
+
+dependencies {
+    testImplementation(libs.paper.api)
+}

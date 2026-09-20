@@ -1,0 +1,19 @@
+# LeafConfig example plugin
+# Edit and run /leafconfigexample reload
+
+# Enable verbose diagnostic messages
+debug: false
+# Maximum number of players allowed to use the reward
+max-players: 100
+# Prefix shown before every message, MiniMessage format
+prefix: '<gray>[<green>Leaf</green>]</gray> '
+# Item handed out by the reward
+reward-item: GOLDEN_APPLE
+# How long a player has to wait between rewards
+cooldown: 5m
+enabled-worlds:
+  - world
+# Database connection settings
+database:
+  host: localhost
+  port: 5432
