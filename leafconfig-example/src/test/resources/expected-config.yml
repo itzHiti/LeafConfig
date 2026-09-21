@@ -11,6 +11,9 @@ prefix: '<gray>[<green>Leaf</green>]</gray> '
 reward-item: GOLDEN_APPLE
 # How long a player has to wait between rewards
 cooldown: 5m
+# Sound played on reward, for example entity.player.levelup
+# null disables the sound
+reward-sound: null
 enabled-worlds:
   - world
 # Database connection settings

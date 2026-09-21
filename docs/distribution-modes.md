@@ -39,7 +39,10 @@ Maven Shade:
 
 Paper API and Adventure are `compileOnly` and must never be shaded.
 
-## B. Paper `plugin.yml` `libraries:` (after Maven Central publication)
+## B. Paper `plugin.yml` `libraries:` (planned for 0.1.1)
+
+Not supported in 0.1.0: it needs published artifacts and a verified server run,
+neither of which exists yet.
 
 ```yaml
 libraries:
@@ -62,7 +65,7 @@ networks controlling all their plugins. Not implemented yet.
 
 | Consumer | Mode |
 |---|---|
-| Public standalone Paper plugin | B once published; A until then or for maximum portability |
+| Public standalone Paper plugin | A in 0.1.0; B from 0.1.1 once published and verified |
 | Legacy or non-Paper server | A |
 | Private network, tens or hundreds of coordinated plugins | C once stable |
 

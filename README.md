@@ -86,6 +86,9 @@ public final class MainConfig {
   @Comment("How long a player has to wait between rewards")
   private Duration cooldown = Duration.ofMinutes(5);
 
+  @Comment({"Sound played on reward, for example entity.player.levelup", "null disables the sound"})
+  private Sound rewardSound = null;
+
   private List<String> enabledWorlds = List.of("world");
 
   @Comment("Database connection settings")
@@ -143,6 +146,9 @@ prefix: '<gray>[<green>Leaf</green>]</gray> '
 reward-item: GOLDEN_APPLE
 # How long a player has to wait between rewards
 cooldown: 5m
+# Sound played on reward, for example entity.player.levelup
+# null disables the sound
+reward-sound: null
 enabled-worlds:
   - world
 # Database connection settings
@@ -232,7 +238,7 @@ Full semantics: [docs/yaml-merge-semantics.md](docs/yaml-merge-semantics.md).
 
 | Your situation | Recommended mode |
 |---|---|
-| Public standalone plugin, Paper server | `plugin.yml` `libraries:` once artifacts are on Maven Central; shaded + relocated until then |
+| Public standalone plugin, Paper server | shaded + relocated (the only mode supported in 0.1.0); `plugin.yml` `libraries:` is planned for 0.1.1 once the artifacts are on Maven Central and verified |
 | Legacy or non-Paper environment | shaded + relocated |
 | Private network with many coordinated plugins | provider plugin (planned, not yet available) |
 

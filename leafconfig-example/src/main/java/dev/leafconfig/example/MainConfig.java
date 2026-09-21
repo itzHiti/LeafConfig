@@ -9,6 +9,7 @@ import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 
 /** Configuration of the example plugin; every field is persisted to {@code config.yml}. */
 @ConfigFile("config.yml")
@@ -31,6 +32,9 @@ public final class MainConfig {
 
   @Comment("How long a player has to wait between rewards")
   private Duration cooldown = Duration.ofMinutes(5);
+
+  @Comment({"Sound played on reward, for example entity.player.levelup", "null disables the sound"})
+  private Sound rewardSound = null;
 
   private List<String> enabledWorlds = List.of("world");
 
@@ -55,6 +59,10 @@ public final class MainConfig {
 
   public Duration cooldown() {
     return cooldown;
+  }
+
+  public Sound rewardSound() {
+    return rewardSound;
   }
 
   public List<String> enabledWorlds() {

@@ -43,5 +43,31 @@ tested; the adapters use only `Material.matchMaterial`, `Particle.values()`,
 `Registry.SOUNDS`, `NamespacedKey.fromString` and MiniMessage, which exist across
 the 1.21 line, but that is an inference, not a verified result.
 
-The server smoke test is `./gradlew :leafconfig-example:runServer` (manual,
-downloads Paper). Its outcome is recorded in this file when it has been run.
+## Server smoke test
+
+Manual, needs network and JDK 21; downloads the pinned Paper server into
+`leafconfig-example/run/` (git-ignored) and starts it with the freshly built
+example plugin installed. The EULA is accepted by the task's JVM flag.
+
+```bash
+./gradlew :leafconfig-example:runServer
+```
+
+Checklist while the console is attached:
+
+1. Startup log contains `Enabling LeafConfigExample v0.1.0` and no stack trace.
+2. `run/plugins/LeafConfigExample/config.yml` equals the generated file shown in
+   the README.
+3. Set `max-players: 500` in that file, run `leafconfigexample reload` in the
+   console: expect `max-players [OUT_OF_RANGE]` and "previous configuration
+   kept"; the file is not modified.
+4. Set `max-players: 100`, `reward-sound: entity.player.levelup`, reload:
+   expect "Configuration reloaded" (covers `Registry.SOUNDS` resolution).
+5. Set `reward-sound: not.a.sound`, reload: expect
+   `reward-sound [INVALID_VALUE]`.
+6. Add an unknown key and a comment above `debug`, delete `cooldown`, reload:
+   `cooldown: 5m` is re-inserted with its comment, everything else untouched.
+7. `stop`. Startup again must not rewrite the file (unchanged timestamp).
+
+Record the Paper build number and the outcome in the compatibility table
+above.
