@@ -43,7 +43,7 @@ sequence or mapping value is `NULL_NOT_ALLOWED`.
 | `net.kyori.adventure.text.Component` | MiniMessage string | defaults are written in canonical MiniMessage form (`<b>` becomes `<bold>`); user text is never rewritten |
 | `org.bukkit.Material` | `STONE`, `stone`, `minecraft:stone` | `Material.matchMaterial` |
 | `org.bukkit.Particle` | constant name, case-insensitive | |
-| `org.bukkit.Sound` | `minecraft:entity.player.levelup`, `entity.player.levelup`, legacy `ENTITY_PLAYER_LEVELUP` | resolved through `Registry.SOUNDS`; requires a running server, so it is not unit-tested offline |
+| `org.bukkit.Sound` | `minecraft:entity.player.levelup`, `entity.player.levelup`, legacy `ENTITY_PLAYER_LEVELUP` | resolved through `Registry.SOUNDS`; needs a running server, verified by the manual smoke test on Paper 1.21.11 |
 | `org.bukkit.NamespacedKey` | `namespace:key` | |
 
 Values the running server does not know fail with `INVALID_VALUE` naming the

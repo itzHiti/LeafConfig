@@ -27,15 +27,14 @@ Paper adapters tolerate values unknown to the running server (for example a
 value rather than throwing.
 
 The `Sound` adapter resolves keys through `Registry.SOUNDS`, which exists only
-on a running server. Its unit test therefore covers only key normalization; a
-server-backed smoke test is planned and has
-not been executed yet.
+on a running server. Its unit test covers key normalization; resolution itself
+was verified by the server smoke test below (Paper 1.21.11, 2026-09-21).
 
 ## Compatibility
 
 | Paper | Compiles against | Unit tests (offline adapters) | Server smoke test |
 |---|---|---|---|
-| 1.21.11 (`paper-api:1.21.11-R0.1-SNAPSHOT`) | yes | yes | see below |
+| 1.21.11 (`paper-api:1.21.11-R0.1-SNAPSHOT`) | yes | yes | passed 2026-09-21, checklist 7/7 (generation, failed reload keeps snapshot and file, `Sound` via registry, invalid sound, merge of removed key, no-op restart) |
 
 Paper publishes its API only as snapshots; the version is pinned in
 `gradle/libs.versions.toml`. Other 1.21.x versions have not been compiled or
