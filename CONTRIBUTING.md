@@ -43,8 +43,9 @@ accepted by the task). It is manual and not part of CI.
 
 ## Releasing
 
-1. Set `version` in `build.gradle.kts` to the release version and update
-   `CHANGELOG.md`.
+1. Set `version` in `build.gradle.kts` to the release version (no `-SNAPSHOT`;
+   the workflow refuses snapshots and tags that do not match the version) and
+   update `CHANGELOG.md`.
 2. Commit, tag `vX.Y.Z`, push the tag.
 3. The `Release` workflow runs `clean check` and `publishToMavenCentral`, which
    uploads a signed staging deployment to the Sonatype Central Portal. Release

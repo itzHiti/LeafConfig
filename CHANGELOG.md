@@ -7,6 +7,10 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.1.1] - 2026-09-21
+
 ### Added
 
 - `DecodeContext.decodeElement(int, Type, ConfigNode)` for sequence elements

@@ -20,6 +20,18 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v6
+      # Fail before building: SNAPSHOT versions cannot go to Central, and a tag must name the
+      # version that build.gradle.kts declares.
+      - name: Check release version
+        run: |
+          version="$(sed -n 's/^ *version = "\([^"]*\)".*/\1/p' build.gradle.kts | head -1)"
+          echo "build.gradle.kts version: $version"
+          case "$version" in
+            *-SNAPSHOT|"") echo "::error::version '$version' is not releasable; set a release version in build.gradle.kts first"; exit 1 ;;
+          esac
+          if [ "${GITHUB_REF_TYPE}" = tag ] && [ "${GITHUB_REF_NAME}" != "v$version" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match version v$version"; exit 1
+          fi
       - run: ./gradlew clean check
       # SIGNING_KEY_B64 is the ASCII-armored private key, base64-encoded into one line, so the
       # secret cannot be damaged by copy-paste. It is decoded into a multi-line Gradle property.
