@@ -3,10 +3,9 @@
 Type-safe, annotation-driven YAML configuration for Paper plugins that evolves
 administrator files without breaking them.
 
-> **Status: pre-1.0, not yet published.** Version `0.1.0` is under active
-> development. Artifacts are not on Maven Central yet; the installation snippets
-> below show the intended coordinates. Publishing is wired up (see
-> [CONTRIBUTING.md](CONTRIBUTING.md#releasing)) but no release has been cut. Public API, diagnostic codes and
+> **Status: pre-1.0.** `0.1.0` is the first release. Public API, diagnostic
+> codes and serialized defaults may still change before `1.0.0`; every breaking
+> change is recorded in [CHANGELOG.md](CHANGELOG.md). Public API, diagnostic codes and
 > serialized defaults may still change before `1.0.0`; every breaking change is
 > recorded in [CHANGELOG.md](CHANGELOG.md).
 

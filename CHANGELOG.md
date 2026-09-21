@@ -7,7 +7,10 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
-Nothing yet.
+### Planned
+
+- Verify and document the `plugin.yml` `libraries:` distribution mode against the
+  published `0.1.0` artifacts.
 
 ## [0.1.0] - 2026-09-21
 

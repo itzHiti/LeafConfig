@@ -1,9 +1,8 @@
 # Getting started
 
-1. Add `io.github.itzhiti:leafconfig-paper` to your plugin (see
+1. Add `io.github.itzhiti:leafconfig-paper:0.1.0` to your plugin (see
    [distribution-modes.md](distribution-modes.md) for how it reaches the
-   server). Artifacts are not published yet; build locally with
-   `./gradlew build` and use the jars from `*/build/libs`.
+   server).
 2. Write a configuration class: a `final` class with a zero-argument
    constructor, private instance fields with initializers, and `@ConfigFile`.
    Nested sections are nested classes with their own zero-argument constructor.
