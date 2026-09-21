@@ -29,22 +29,25 @@ public final class YamlDocument {
   private final MappingNode root;
   private final YamlStyle style;
   private final boolean generated;
+  private final String preamble;
 
-  private YamlDocument(MappingNode root, YamlStyle style, boolean generated) {
+  private YamlDocument(MappingNode root, YamlStyle style, boolean generated, String preamble) {
     this.root = root;
     this.style = style;
     this.generated = generated;
+    this.preamble = preamble;
   }
 
   /** Creates an empty document to be filled from schema defaults. */
   public static YamlDocument empty() {
-    return new YamlDocument(emptyMapping(), YamlStyle.DEFAULT, true);
+    return new YamlDocument(emptyMapping(), YamlStyle.DEFAULT, true, "");
   }
 
   /**
    * Parses {@code text}. Returns {@code null} after recording a diagnostic when the text is not
    * well-formed YAML, contains duplicate keys, or its root is not a mapping. A file without a
-   * document (empty or comments only) yields an empty mapping.
+   * document (empty or comments only) yields an empty mapping; its original text, which can only
+   * consist of comments and blank lines, is kept verbatim in front of the rendered output.
    */
   public static YamlDocument parse(String text, YamlLimits limits, DiagnosticCollector collector) {
     YamlStyle style = YamlStyle.detect(text);
@@ -70,8 +73,13 @@ public final class YamlDocument {
       collector.error(ConfigPath.root(), DiagnosticCodes.YAML_SYNTAX, e.getMessage(), null);
       return null;
     }
-    if (composed.isEmpty()) {
-      return new YamlDocument(emptyMapping(), style, true);
+    // SnakeYAML Engine represents a comments-only stream as a node tagged "comment".
+    if (composed.isEmpty()
+        || "tag:yaml.org,2002:comment".equals(composed.get().getTag().getValue())) {
+      String separator = style.lineSeparator();
+      // Blank line between the administrator notes and the generated content.
+      String preamble = body.isBlank() ? "" : body.stripTrailing() + separator + separator;
+      return new YamlDocument(emptyMapping(), style, true, preamble);
     }
     if (!(composed.get() instanceof MappingNode mapping)) {
       collector.error(
@@ -81,7 +89,7 @@ public final class YamlDocument {
           NodeConverter.location(composed.get()));
       return null;
     }
-    return new YamlDocument(mapping, style, mapping.getValue().isEmpty());
+    return new YamlDocument(mapping, style, mapping.getValue().isEmpty(), "");
   }
 
   /** Returns the mutable root mapping. */
@@ -101,7 +109,14 @@ public final class YamlDocument {
 
   /** Renders the document with the original indentation and line endings. */
   public String render() {
-    return YamlRenderer.render(root, style);
+    String rendered = YamlRenderer.render(root, style);
+    if (preamble.isEmpty()) {
+      return rendered;
+    }
+    // The renderer emits the BOM, if any; it has to stay first.
+    return style.bom()
+        ? rendered.charAt(0) + preamble + rendered.substring(1)
+        : preamble + rendered;
   }
 
   private static MappingNode emptyMapping() {

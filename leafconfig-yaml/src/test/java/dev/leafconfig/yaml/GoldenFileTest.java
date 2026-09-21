@@ -41,7 +41,8 @@ class GoldenFileTest {
         "empty-collections-and-null",
         "unicode-crlf",
         "four-space-indent",
-        "unindented-sequences");
+        "unindented-sequences",
+        "comments-only");
   }
 
   @ParameterizedTest

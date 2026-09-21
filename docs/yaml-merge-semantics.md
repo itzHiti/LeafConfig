@@ -41,6 +41,7 @@ and `expected.yml` after one load):
 | Indent width and indented/unindented sequences follow the file | `four-space-indent`, `unindented-sequences` |
 | CRLF and a UTF-8 BOM are preserved | `unicode-crlf` |
 | First generation writes the type-level header, a blank line, then keys | `first-generation` |
+| A file that contains only comments keeps them verbatim, followed by a blank line and the generated content | `comments-only` |
 | Malformed YAML and duplicate keys leave the file byte for byte untouched | `GoldenFileTest` |
 | Unchanged documents are not rewritten | `ConfigManagerTest.unchangedDocumentIsNotRewritten` |
 
@@ -48,8 +49,6 @@ and `expected.yml` after one load):
 
 - Folded scalars (`>`) are re-folded; the value is unchanged but line breaks
   inside the scalar are not preserved.
-- A file with only comments (no document) loses those comments when defaults
-  are written into it.
 - Merge does not descend into `Map<String, Nested>` values or sequence
   elements; only mapping sections that correspond to nested configuration
   objects receive new keys.
