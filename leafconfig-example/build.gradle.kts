@@ -41,8 +41,33 @@ dependencies {
     testImplementation(libs.paper.api)
 }
 
-// Manual smoke test only (downloads a Paper server, needs network): ./gradlew :leafconfig-example:runServer
+// Published LeafConfig version that the no-shade variant asks Paper to download.
+val publishedLeafConfigVersion = "0.1.0"
+val minecraftVersion = libs.versions.paper.api.get().substringBefore("-")
+
+// No-shade variant: only the plugin's own classes; plugin.yml `libraries:` makes Paper resolve
+// leafconfig-paper and its dependencies from Maven Central at startup.
+val librariesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("libraries")
+    from(sourceSets.main.get().output) { exclude("plugin.yml") }
+    val props = mapOf("version" to project.version.toString(), "leafconfigVersion" to publishedLeafConfigVersion)
+    inputs.properties(props)
+    from("src/libraries") { expand(props) }
+}
+
+// Manual smoke tests only (download a Paper server, need network):
+//   ./gradlew :leafconfig-example:runServer            shaded + relocated jar
+//   ./gradlew :leafconfig-example:runServerLibraries   no-shade jar, library from Maven Central
 tasks.runServer {
-    minecraftVersion(libs.versions.paper.api.get().substringBefore("-"))
+    minecraftVersion(minecraftVersion)
+    jvmArgs("-Dcom.mojang.eula.agree=true")
+}
+
+tasks.register<xyz.jpenilla.runpaper.task.RunServer>("runServerLibraries") {
+    group = "run paper"
+    description = "Runs a Paper server with the no-shade example plugin"
+    version.set(minecraftVersion)
+    pluginJars.from(librariesJar)
+    runDirectory.set(layout.projectDirectory.dir("run-libraries"))
     jvmArgs("-Dcom.mojang.eula.agree=true")
 }

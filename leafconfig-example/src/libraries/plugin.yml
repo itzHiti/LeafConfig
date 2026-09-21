@@ -1,0 +1,15 @@
+name: LeafConfigExample
+version: "${version}"
+main: dev.leafconfig.example.ExamplePlugin
+api-version: "1.21"
+description: Minimal plugin demonstrating LeafConfig (no-shade variant, Paper resolves the library)
+libraries:
+  - io.github.itzhiti:leafconfig-paper:${leafconfigVersion}
+commands:
+  leafconfigexample:
+    description: Reload the example configuration
+    usage: /<command> reload
+    permission: leafconfigexample.reload
+permissions:
+  leafconfigexample.reload:
+    default: op
