@@ -15,6 +15,7 @@ concurrency:
 jobs:
   build:
     name: Build and test (Java 21)
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -44,6 +45,7 @@ jobs:
 
   example:
     name: Example plugin assembly
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
