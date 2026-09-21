@@ -21,11 +21,22 @@ jobs:
           java-version: 21
       - uses: gradle/actions/setup-gradle@v6
       - run: ./gradlew clean check
+      # SIGNING_KEY_B64 is the ASCII-armored private key, base64-encoded into one line, so the
+      # secret cannot be damaged by copy-paste. It is decoded into a multi-line Gradle property.
+      - name: Decode signing key
+        env:
+          SIGNING_KEY_B64: ${{ secrets.SIGNING_KEY_B64 }}
+        run: |
+          {
+            echo "ORG_GRADLE_PROJECT_signingInMemoryKey<<LEAFCONFIG_KEY_EOF"
+            echo "$SIGNING_KEY_B64" | base64 -d
+            echo
+            echo "LEAFCONFIG_KEY_EOF"
+          } >> "$GITHUB_ENV"
       - run: ./gradlew publishToMavenCentral --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
       - uses: actions/upload-artifact@v7
         with:

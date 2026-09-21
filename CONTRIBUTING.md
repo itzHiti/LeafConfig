@@ -52,8 +52,11 @@ accepted by the task). It is manual and not part of CI.
 4. Bump `version` to the next `-SNAPSHOT`.
 
 Required repository secrets (environment `release`): `MAVEN_CENTRAL_USERNAME`,
-`MAVEN_CENTRAL_PASSWORD` (Central Portal user token), `SIGNING_KEY` (ASCII
-armored private key), `SIGNING_KEY_PASSWORD`. Pull-request workflows never
+`MAVEN_CENTRAL_PASSWORD` (Central Portal user token), `SIGNING_KEY_B64` (the
+ASCII-armored private key, base64-encoded into a single line, for example with
+`base64 -w0 private.asc` or PowerShell
+`[Convert]::ToBase64String([IO.File]::ReadAllBytes("private.asc"))`),
+`SIGNING_KEY_PASSWORD`. Pull-request workflows never
 receive them. Locally, `./gradlew publishToMavenLocal` produces unsigned
 artifacts for testing.
 
