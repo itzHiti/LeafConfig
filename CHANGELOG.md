@@ -7,6 +7,14 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.1.0] - 2026-09-21
+
+First release. Supported distribution mode: shaded and relocated jar. Compiled
+against Paper `1.21.11-R0.1-SNAPSHOT`; server smoke test passed on Paper 1.21.11.
+Shaded example plugin: 459 489 bytes.
+
 ### Added
 
 - `leafconfig-api`: annotations `@ConfigFile`, `@Key`, `@Comment`, `@Ignore`,
