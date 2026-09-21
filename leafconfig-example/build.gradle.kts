@@ -22,7 +22,10 @@ tasks.processResources {
 
 tasks.shadowJar {
     archiveClassifier.set("")
-    relocate("dev.leafconfig", "dev.leafconfig.example.libs.leafconfig")
+    // The plugin itself lives under dev.leafconfig.example and must keep its name for plugin.yml.
+    relocate("dev.leafconfig", "dev.leafconfig.example.libs.leafconfig") {
+        exclude("dev.leafconfig.example.**")
+    }
     relocate("org.snakeyaml.engine", "dev.leafconfig.example.libs.snakeyaml")
 }
 
