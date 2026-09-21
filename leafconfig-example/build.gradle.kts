@@ -70,4 +70,9 @@ tasks.register<xyz.jpenilla.runpaper.task.RunServer>("runServerLibraries") {
     pluginJars.from(librariesJar)
     runDirectory.set(layout.projectDirectory.dir("run-libraries"))
     jvmArgs("-Dcom.mojang.eula.agree=true")
+    // Paper resolves `libraries:` from a Google mirror of Maven Central that lags behind repo1.
+    // -Pleafconfig.centralRepository=https://repo1.maven.org/maven2 points it elsewhere for testing.
+    providers.gradleProperty("leafconfig.centralRepository").orNull?.let {
+        jvmArgs("-Dorg.bukkit.plugin.java.LibraryLoader.centralURL=$it")
+    }
 }

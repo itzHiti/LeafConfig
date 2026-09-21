@@ -50,7 +50,14 @@ libraries:
 ```
 
 Paper downloads the artifact and its dependencies and adds them to the
-plugin's class loader. No shading, small jar. Each plugin still gets its own
+plugin's class loader. Paper resolves from a Google-hosted mirror of Maven
+Central (`maven-central.storage-download.googleapis.com`), which can lag behind
+`repo1.maven.org` by hours after a release; a freshly published version may
+fail with `Could not find artifact ... in central` until the mirror catches up.
+Server owners can point Paper at another repository with the environment
+variable `PAPER_DEFAULT_CENTRAL_REPOSITORY` or the system property
+`org.bukkit.plugin.java.LibraryLoader.centralURL` (Paper 1.21.11 source,
+`MavenLibraryResolver`). No shading, small jar. Each plugin still gets its own
 class-loader view; this mode does not guarantee one shared class definition or
 runtime instance across plugins. Not usable until the artifacts are on Maven
 Central; do not point this at a private repository for a public plugin.
