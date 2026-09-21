@@ -7,10 +7,14 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
-### Planned
+### Added
 
-- Verify and document the `plugin.yml` `libraries:` distribution mode against the
-  published `0.1.0` artifacts.
+- `leafconfig-example`: no-shade variant (`librariesJar`, `runServerLibraries`)
+  using `plugin.yml` `libraries:`; verified against the published `0.1.0`
+  artifacts on Paper 1.21.11. Distribution mode B is now documented as
+  supported.
+- Docs: note on the Google-hosted Central mirror used by Paper lagging behind
+  `repo1.maven.org` after a release, and how to override it.
 
 ## [0.1.0] - 2026-09-21
 

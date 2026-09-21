@@ -39,10 +39,15 @@ Maven Shade:
 
 Paper API and Adventure are `compileOnly` and must never be shaded.
 
-## B. Paper `plugin.yml` `libraries:` (planned for 0.1.1)
+## B. Paper `plugin.yml` `libraries:`
 
-Not supported in 0.1.0: it needs published artifacts and a verified server run,
-neither of which exists yet.
+Verified on 2026-09-21 with the published `0.1.0` artifacts on Paper 1.21.11
+(build 132): the no-shade example plugin (`./gradlew
+:leafconfig-example:runServerLibraries`) resolved `leafconfig-paper` and its
+transitive dependencies and passed the same 7-point smoke-test checklist as the
+shaded variant. The run used `repo1.maven.org` as the Central repository
+because the default Google mirror had not yet synchronized the new artifacts
+(see below); the default-mirror run is repeated once the mirror catches up.
 
 ```yaml
 libraries:
@@ -72,7 +77,7 @@ networks controlling all their plugins. Not implemented yet.
 
 | Consumer | Mode |
 |---|---|
-| Public standalone Paper plugin | A in 0.1.0; B from 0.1.1 once published and verified |
+| Public standalone Paper plugin | B for the smallest jar; A when the server may lack internet access or runs a non-Paper fork |
 | Legacy or non-Paper server | A |
 | Private network, tens or hundreds of coordinated plugins | C once stable |
 

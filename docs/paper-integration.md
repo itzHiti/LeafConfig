@@ -34,7 +34,7 @@ was verified by the server smoke test below (Paper 1.21.11, 2026-09-21).
 
 | Paper | Compiles against | Unit tests (offline adapters) | Server smoke test |
 |---|---|---|---|
-| 1.21.11 (`paper-api:1.21.11-R0.1-SNAPSHOT`) | yes | yes | passed 2026-09-21, checklist 7/7 (generation, failed reload keeps snapshot and file, `Sound` via registry, invalid sound, merge of removed key, no-op restart) |
+| 1.21.11 build 132 (`paper-api:1.21.11-R0.1-SNAPSHOT`) | yes | yes | passed 2026-09-21, checklist 7/7 for both the shaded jar and the `libraries:` jar (generation, failed reload keeps snapshot and file, `Sound` via registry, invalid sound, merge of removed key, no-op restart) |
 
 Paper publishes its API only as snapshots; the version is pinned in
 `gradle/libs.versions.toml`. Other 1.21.x versions have not been compiled or

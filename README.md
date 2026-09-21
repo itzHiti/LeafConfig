@@ -237,7 +237,7 @@ Full semantics: [docs/yaml-merge-semantics.md](docs/yaml-merge-semantics.md).
 
 | Your situation | Recommended mode |
 |---|---|
-| Public standalone plugin, Paper server | shaded + relocated (the only mode supported in 0.1.0); `plugin.yml` `libraries:` is planned for 0.1.1 once the artifacts are on Maven Central and verified |
+| Public standalone plugin, Paper server | `plugin.yml` `libraries:` for the smallest jar (verified on Paper 1.21.11); shaded + relocated when the server has no internet access |
 | Legacy or non-Paper environment | shaded + relocated |
 | Private network with many coordinated plugins | provider plugin (planned, not yet available) |
 
