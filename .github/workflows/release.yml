@@ -23,14 +23,33 @@ jobs:
       - run: ./gradlew clean check
       # SIGNING_KEY_B64 is the ASCII-armored private key, base64-encoded into one line, so the
       # secret cannot be damaged by copy-paste. It is decoded into a multi-line Gradle property.
-      - name: Decode signing key
+      - name: Check secrets and decode signing key
         env:
           SIGNING_KEY_B64: ${{ secrets.SIGNING_KEY_B64 }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
         run: |
+          fail=0
+          for name in SIGNING_KEY_B64 SIGNING_KEY_PASSWORD MAVEN_CENTRAL_USERNAME MAVEN_CENTRAL_PASSWORD; do
+            value="${!name}"
+            if [ -z "$value" ]; then
+              echo "::error::secret $name is empty or not visible to this job; define it in the 'release' environment or at repository level"
+              fail=1
+            else
+              echo "$name: ${#value} chars"
+            fi
+          done
+          [ "$fail" = 0 ] || exit 1
+          key="$(printf '%s' "$SIGNING_KEY_B64" | tr -d ' \r\n' | base64 -d)"
+          echo "decoded key: $(printf '%s\n' "$key" | wc -l) lines, first line: $(printf '%s\n' "$key" | head -1)"
+          case "$key" in
+            "-----BEGIN PGP PRIVATE KEY BLOCK-----"*) ;;
+            *) echo "::error::SIGNING_KEY_B64 does not decode to an ASCII-armored private key"; exit 1 ;;
+          esac
           {
             echo "ORG_GRADLE_PROJECT_signingInMemoryKey<<LEAFCONFIG_KEY_EOF"
-            echo "$SIGNING_KEY_B64" | base64 -d
-            echo
+            printf '%s\n' "$key"
             echo "LEAFCONFIG_KEY_EOF"
           } >> "$GITHUB_ENV"
       - run: ./gradlew publishToMavenCentral --no-configuration-cache
