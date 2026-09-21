@@ -37,8 +37,9 @@ Rules:
   path and source line.
 - `decode` is never called with a YAML `null` and `encode` never with `null`;
   the framework handles null semantics.
-- Composite adapters delegate to `context.decodeChild(segment, type, node)` so
-  element failures are aggregated instead of aborting the load.
+- Composite adapters delegate to `context.decodeChild(key, type, node)` for
+  mapping entries and `context.decodeElement(index, type, node)` for sequence
+  elements, so element failures are aggregated instead of aborting the load.
 
 ## Generic types and factories
 

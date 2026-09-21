@@ -47,7 +47,7 @@ public final class CollectionAdapterFactory implements TypeAdapterFactory {
             Collection<Object> result = set ? new LinkedHashSet<>() : new ArrayList<>();
             int index = 0;
             for (ConfigNode child : sequence.elements()) {
-              result.add(context.decodeChild("[" + index + "]", element, child));
+              result.add(context.decodeElement(index, element, child));
               index++;
             }
             return set

@@ -29,4 +29,12 @@ public interface DecodeContext {
    * @return decoded value or {@code null} on failure
    */
   Object decodeChild(String segment, Type type, ConfigNode node);
+
+  /**
+   * Decodes the element at {@code index} of a sequence; equivalent to {@link #decodeChild} with the
+   * {@code [index]} path segment used by {@link ConfigPath#index(int)}.
+   */
+  default Object decodeElement(int index, Type type, ConfigNode node) {
+    return decodeChild("[" + index + "]", type, node);
+  }
 }

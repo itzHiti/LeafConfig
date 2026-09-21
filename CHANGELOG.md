@@ -9,6 +9,8 @@ allowed and listed under **Changed**.
 
 ### Added
 
+- `DecodeContext.decodeElement(int, Type, ConfigNode)` for sequence elements
+  (default method; `decodeChild` with a `[index]` segment still works).
 - `leafconfig-example`: no-shade variant (`librariesJar`, `runServerLibraries`)
   using `plugin.yml` `libraries:`; verified against the published `0.1.0`
   artifacts on Paper 1.21.11. Distribution mode B is now documented as

@@ -22,6 +22,27 @@ leafconfig-example  documentation plugin, shaded + relocated
 Public surface of the module: `ConfigManager`, `ConfigManager.Builder`,
 `YamlLimits`. Everything under `internal` may change without notice.
 
+## Compatibility policy before 1.0
+
+Public packages are `dev.leafconfig`, `dev.leafconfig.annotation`,
+`dev.leafconfig.adapter`, `dev.leafconfig.node`, `dev.leafconfig.validation`,
+`dev.leafconfig.yaml` (only `ConfigManager`, `ConfigManager.Builder`,
+`YamlLimits`) and `dev.leafconfig.paper`. Everything under `internal` may change
+in any release.
+
+- Value types such as `ConfigDiagnostic`, `ReloadResult` and the node records
+  are Java records. When a component is added, the previous canonical
+  constructor is kept as an explicit overload so existing callers keep
+  compiling and linking; accessors are never removed.
+- `ConfigNode` is sealed. A new node kind before 1.0 is a breaking change for
+  exhaustive `switch` statements in user adapters and is announced in the
+  changelog.
+- Diagnostic codes are only ever added; existing codes keep their meaning.
+- Interfaces intended for users to implement (`TypeAdapter`,
+  `TypeAdapterFactory`, `ConfigValidator`) only gain `default` methods.
+- Interfaces implemented by LeafConfig (`ConfigHandle`, `DecodeContext`,
+  `EncodeContext`, `ValidationContext`) may gain abstract methods.
+
 ## Invariants
 
 - No global mutable state. Caches (schemas, adapters) belong to a
