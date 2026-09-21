@@ -1,13 +1,20 @@
-# LeafConfig
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b7ba3533-ddc6-4343-81f6-da821067d0ca" alt="LeafConfig" width="640">
+</p>
 
-Type-safe, annotation-driven YAML configuration for Paper plugins that evolves
-administrator files without breaking them.
+<p align="center">
+  <a href="https://github.com/itzHiti/LeafConfig/actions/workflows/ci.yml"><img src="https://github.com/itzHiti/LeafConfig/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="https://github.com/itzHiti/LeafConfig/actions/workflows/release.yml"><img src="https://github.com/itzHiti/LeafConfig/actions/workflows/release.yml/badge.svg" alt="Release"></a>
+  <a href="https://central.sonatype.com/artifact/io.github.itzhiti/leafconfig-paper"><img src="https://img.shields.io/maven-central/v/io.github.itzhiti/leafconfig-paper?label=Maven%20Central" alt="Maven Central"></a>
+  <a href="https://javadoc.io/doc/io.github.itzhiti/leafconfig-api"><img src="https://javadoc.io/badge2/io.github.itzhiti/leafconfig-api/javadoc.svg" alt="Javadoc"></a>
+  <img src="https://img.shields.io/badge/Java-21-orange" alt="Java 21">
+  <img src="https://img.shields.io/badge/Paper-1.21.x-blue" alt="Paper 1.21.x">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-green" alt="License: Apache-2.0"></a>
+</p>
 
-> **Status: pre-1.0.** `0.1.0` is the first release. Public API, diagnostic
-> codes and serialized defaults may still change before `1.0.0`; every breaking
-> change is recorded in [CHANGELOG.md](CHANGELOG.md). Public API, diagnostic codes and
-> serialized defaults may still change before `1.0.0`; every breaking change is
-> recorded in [CHANGELOG.md](CHANGELOG.md).
+> **Status: pre-1.0.** Public API, diagnostic codes and serialized defaults may
+> still change before `1.0.0`; every breaking change is recorded in
+> [CHANGELOG.md](CHANGELOG.md).
 
 ## Requirements
 
