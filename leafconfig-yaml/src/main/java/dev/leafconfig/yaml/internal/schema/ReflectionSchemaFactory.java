@@ -32,9 +32,9 @@ import java.util.regex.PatternSyntaxException;
 /**
  * The only place in the runtime that touches {@code java.lang.reflect} for user models.
  *
- * <p>Rules enforced here: instance fields are persisted unless static,
- * transient, synthetic or {@code @Ignore}; final fields, inherited persisted fields, duplicate
- * keys, invalid {@code @Key} values and misplaced validation annotations are rejected with {@link
+ * <p>Rules enforced here: instance fields are persisted unless static, transient, synthetic or
+ * {@code @Ignore}; final fields, inherited persisted fields, duplicate keys, invalid {@code @Key}
+ * values and misplaced validation annotations are rejected with {@link
  * DiagnosticCodes#INVALID_MODEL} diagnostics.
  */
 public final class ReflectionSchemaFactory implements SchemaFactory {

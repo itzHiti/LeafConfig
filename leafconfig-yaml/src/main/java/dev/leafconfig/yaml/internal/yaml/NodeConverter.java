@@ -23,8 +23,8 @@ import org.snakeyaml.engine.v2.nodes.Tag;
 
 /**
  * Converts between SnakeYAML nodes and the backend-neutral {@link ConfigNode} model while enforcing
- * the safety rules: no anchors or aliases, only core-schema tags, scalar
- * keys only, and resource limits.
+ * the safety rules: no anchors or aliases, only core-schema tags, scalar keys only, and resource
+ * limits.
  */
 final class NodeConverter {
 

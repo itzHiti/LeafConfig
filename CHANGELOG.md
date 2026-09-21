@@ -24,7 +24,13 @@ allowed and listed under **Changed**.
 - `leafconfig-paper`: `LeafConfig.forPlugin(JavaPlugin)` and adapters for
   Adventure `Component` (MiniMessage), `Material`, `Particle`, `Sound`,
   `NamespacedKey`.
-- `leafconfig-example`: shaded, relocated example plugin with a reload command.
+- `leafconfig-example`: shaded, relocated example plugin with a reload command
+  and a manual `runServer` smoke-test task.
+- `leafconfig-benchmarks`: JMH baseline suite (cold discovery and load, no-op
+  reload, merge-and-write reload), results in `docs/benchmarks.md`.
+- Publishing: Maven Central coordinates `io.github.itzhiti:leafconfig-*`,
+  sources and Javadoc jars, POM metadata, signed staging uploads from the
+  `Release` workflow on `v*` tags.
 - Build: Java 21 toolchain, Spotless, Error Prone, JaCoCo (80% line coverage
   gate on `leafconfig-yaml`), GitHub Actions CI.
 
@@ -38,3 +44,4 @@ allowed and listed under **Changed**.
 - `Optional<T>` is not supported yet (deferred until its null/missing semantics
   are covered by tests).
 - Inherited persisted fields are rejected rather than partially supported.
+- A file containing only comments keeps them verbatim above generated content.

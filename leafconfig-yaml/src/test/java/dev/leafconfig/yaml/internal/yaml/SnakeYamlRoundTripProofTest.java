@@ -24,8 +24,8 @@ import org.snakeyaml.engine.v2.nodes.ScalarNode;
 import org.snakeyaml.engine.v2.nodes.Tag;
 
 /**
- * Proof for the YAML layer: the chosen node API must re-render comments, quoted and
- * block scalars, unknown keys and key order before any merge architecture is committed.
+ * Proof for the YAML layer: the chosen node API must re-render comments, quoted and block scalars,
+ * unknown keys and key order before any merge architecture is committed.
  *
  * <p>Known limitation found by this proof: line breaks inside folded scalars ({@code >}) are not
  * preserved; the emitter re-folds the text. The scalar value itself is unchanged.

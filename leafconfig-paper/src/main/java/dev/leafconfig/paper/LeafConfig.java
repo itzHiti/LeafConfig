@@ -13,9 +13,9 @@ import org.bukkit.plugin.java.JavaPlugin;
  * registered with the server: no commands, listeners or tasks. Call {@link ConfigManager#close()}
  * from {@code onDisable()} so reload listeners and cached metadata are released with the plugin.
  *
- * <p>Design note: the original API sketch showed an explicit {@code registerPaperAdapters()}
- * step. It is omitted because there is no supported configuration in which a Paper plugin would
- * want the Paper adapters absent; user adapters already take precedence over them.
+ * <p>Design note: the original API sketch showed an explicit {@code registerPaperAdapters()} step.
+ * It is omitted because there is no supported configuration in which a Paper plugin would want the
+ * Paper adapters absent; user adapters already take precedence over them.
  */
 public final class LeafConfig {
 

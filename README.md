@@ -5,7 +5,8 @@ administrator files without breaking them.
 
 > **Status: pre-1.0, not yet published.** Version `0.1.0` is under active
 > development. Artifacts are not on Maven Central yet; the installation snippets
-> below show the intended coordinates. Public API, diagnostic codes and
+> below show the intended coordinates. Publishing is wired up (see
+> [CONTRIBUTING.md](CONTRIBUTING.md#releasing)) but no release has been cut. Public API, diagnostic codes and
 > serialized defaults may still change before `1.0.0`; every breaking change is
 > recorded in [CHANGELOG.md](CHANGELOG.md).
 
@@ -220,8 +221,8 @@ Verified by the golden-file suite in
 Known limitations:
 
 - Line breaks inside folded scalars (`>`) are re-folded by the emitter.
-- A file containing only comments loses those comments when defaults are
-  written into it.
+- A file containing only comments keeps them verbatim above the generated
+  content.
 - Sequence entries inside `Map`s or `List`s are not merged; only mapping
   sections that correspond to nested configuration objects receive new keys.
 

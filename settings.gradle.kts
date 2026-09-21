@@ -5,4 +5,5 @@ include(
     "leafconfig-yaml",
     "leafconfig-paper",
     "leafconfig-example",
+    "leafconfig-benchmarks",
 )

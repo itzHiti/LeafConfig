@@ -1,9 +1,16 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
     alias(libs.plugins.errorprone) apply false
+    alias(libs.plugins.maven.publish) apply false
     alias(libs.plugins.spotless)
 }
+
+// Library modules published to Maven Central; the example plugin and benchmarks are not.
+val publishedModules = setOf("leafconfig-api", "leafconfig-yaml", "leafconfig-paper")
 
 allprojects {
     group = "io.github.itzhiti"
@@ -34,8 +41,49 @@ subprojects {
 
     extensions.configure<JavaPluginExtension> {
         toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-        withSourcesJar()
-        withJavadocJar()
+    }
+
+    if (name in publishedModules) {
+        apply(plugin = "com.vanniktech.maven.publish")
+        extensions.configure<MavenPublishBaseExtension> {
+            // Staging only: the release is triggered by hand in the Central Portal after review.
+            publishToMavenCentral(automaticRelease = false)
+            // Signing needs the in-memory key from CI secrets; local builds without it still
+            // assemble and publish to mavenLocal unsigned.
+            if (providers.gradleProperty("signingInMemoryKey").isPresent) {
+                signAllPublications()
+            }
+            configure(JavaLibrary(javadocJar = JavadocJar.Javadoc(), sourcesJar = true))
+            coordinates(group.toString(), name, version.toString())
+            pom {
+                name.set(project.name)
+                description.set(provider { project.description ?: project.name })
+                url.set("https://github.com/itzHiti/LeafConfig")
+                licenses {
+                    license {
+                        name.set("Apache-2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("itzHiti")
+                        name.set("itzHiti")
+                        url.set("https://github.com/itzHiti")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/itzHiti/LeafConfig")
+                    connection.set("scm:git:https://github.com/itzHiti/LeafConfig.git")
+                    developerConnection.set("scm:git:ssh://git@github.com/itzHiti/LeafConfig.git")
+                }
+            }
+        }
+    } else {
+        extensions.configure<JavaPluginExtension> {
+            withSourcesJar()
+            withJavadocJar()
+        }
     }
 
     extensions.configure<JacocoPluginExtension> {

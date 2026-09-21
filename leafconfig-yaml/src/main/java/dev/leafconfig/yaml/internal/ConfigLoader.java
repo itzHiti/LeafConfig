@@ -28,9 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The load pipeline: read, parse, convert, decode, validate, merge,
- * persist. Nothing is written unless the document changed, and no instance is returned unless every
- * step succeeded.
+ * The load pipeline: read, parse, convert, decode, validate, merge, persist. Nothing is written
+ * unless the document changed, and no instance is returned unless every step succeeded.
  */
 public final class ConfigLoader {
 

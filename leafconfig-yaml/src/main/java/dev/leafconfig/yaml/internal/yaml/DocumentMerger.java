@@ -22,10 +22,9 @@ import org.snakeyaml.engine.v2.nodes.Tag;
  * Inserts missing schema keys and schema comments into an existing document without touching
  * anything the administrator wrote.
  *
- * <p>Rules: unknown keys are never removed, existing keys are never
- * reordered or restyled, a schema comment is added only to keys that have no leading comment, and a
- * new key is placed directly after its nearest preceding schema neighbour that exists in the
- * document.
+ * <p>Rules: unknown keys are never removed, existing keys are never reordered or restyled, a schema
+ * comment is added only to keys that have no leading comment, and a new key is placed directly
+ * after its nearest preceding schema neighbour that exists in the document.
  */
 public final class DocumentMerger {
 

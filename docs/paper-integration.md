@@ -31,6 +31,17 @@ on a running server. Its unit test therefore covers only key normalization; a
 server-backed smoke test is planned and has
 not been executed yet.
 
-Built against `io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT`. Paper
-publishes its API only as snapshots; the version is pinned in
-`gradle/libs.versions.toml`.
+## Compatibility
+
+| Paper | Compiles against | Unit tests (offline adapters) | Server smoke test |
+|---|---|---|---|
+| 1.21.11 (`paper-api:1.21.11-R0.1-SNAPSHOT`) | yes | yes | see below |
+
+Paper publishes its API only as snapshots; the version is pinned in
+`gradle/libs.versions.toml`. Other 1.21.x versions have not been compiled or
+tested; the adapters use only `Material.matchMaterial`, `Particle.values()`,
+`Registry.SOUNDS`, `NamespacedKey.fromString` and MiniMessage, which exist across
+the 1.21 line, but that is an inference, not a verified result.
+
+The server smoke test is `./gradlew :leafconfig-example:runServer` (manual,
+downloads Paper). Its outcome is recorded in this file when it has been run.

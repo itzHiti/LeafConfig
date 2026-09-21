@@ -28,6 +28,35 @@ When a change alters rendering, re-record with
 then review every changed `expected.yml` by hand and explain the difference in
 the commit message. Never update snapshots blindly.
 
+## Benchmarks
+
+`./gradlew :leafconfig-benchmarks:jmh` runs the JMH suite (not part of
+`check`). Results land in `leafconfig-benchmarks/build/results/jmh/results.json`.
+Record methodology and numbers in `docs/benchmarks.md`; never quote a number
+without JDK, Gradle version, parameters and hardware.
+
+## Paper smoke test
+
+`./gradlew :leafconfig-example:runServer` downloads the pinned Paper version
+and starts it with the example plugin installed (network required, EULA is
+accepted by the task). It is manual and not part of CI.
+
+## Releasing
+
+1. Set `version` in `build.gradle.kts` to the release version and update
+   `CHANGELOG.md`.
+2. Commit, tag `vX.Y.Z`, push the tag.
+3. The `Release` workflow runs `clean check` and `publishToMavenCentral`, which
+   uploads a signed staging deployment to the Sonatype Central Portal. Release
+   it manually there after checking the artifacts.
+4. Bump `version` to the next `-SNAPSHOT`.
+
+Required repository secrets (environment `release`): `MAVEN_CENTRAL_USERNAME`,
+`MAVEN_CENTRAL_PASSWORD` (Central Portal user token), `SIGNING_KEY` (ASCII
+armored private key), `SIGNING_KEY_PASSWORD`. Pull-request workflows never
+receive them. Locally, `./gradlew publishToMavenLocal` produces unsigned
+artifacts for testing.
+
 ## Pull requests
 
 - Conventional commits: `feat(yaml): ...`, `fix(paper): ...`, `test(api): ...`.

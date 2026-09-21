@@ -10,6 +10,10 @@ jacoco = "0.8.15"
 errorprone-plugin = "5.1.1"
 spotless = "8.10.2"
 shadow = "9.6.1"
+maven-publish = "0.37.0"
+jmh-plugin = "0.7.3"
+jmh-core = "1.37"
+run-paper = "3.1.0"
 
 [libraries]
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
@@ -24,3 +28,6 @@ errorprone-core = { module = "com.google.errorprone:error_prone_core", version.r
 errorprone = { id = "net.ltgt.errorprone", version.ref = "errorprone-plugin" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
+jmh = { id = "me.champeau.jmh", version.ref = "jmh-plugin" }
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }

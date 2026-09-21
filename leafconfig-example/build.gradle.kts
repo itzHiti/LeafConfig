@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.shadow)
+    alias(libs.plugins.run.paper)
 }
 
 description = "Minimal Paper plugin demonstrating LeafConfig"
@@ -35,4 +36,10 @@ tasks.named<Jar>("sourcesJar") { enabled = false }
 
 dependencies {
     testImplementation(libs.paper.api)
+}
+
+// Manual smoke test only (downloads a Paper server, needs network): ./gradlew :leafconfig-example:runServer
+tasks.runServer {
+    minecraftVersion(libs.versions.paper.api.get().substringBefore("-"))
+    jvmArgs("-Dcom.mojang.eula.agree=true")
 }
