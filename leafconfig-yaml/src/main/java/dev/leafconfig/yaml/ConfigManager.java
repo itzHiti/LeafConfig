@@ -22,7 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Loads annotated configuration classes from YAML files inside one base directory.
@@ -43,9 +42,8 @@ public final class ConfigManager implements AutoCloseable {
   private final SchemaFactory schemaFactory;
   private final ConfigLoader loader;
   private final Map<Class<?>, ConfigSchema> schemas = new HashMap<>();
-  private final ConcurrentHashMap<Class<?>, DefaultConfigHandle<?>> handles =
-      new ConcurrentHashMap<>();
-  private volatile boolean closed;
+  private final Map<Class<?>, DefaultConfigHandle<?>> handles = new HashMap<>();
+  private boolean closed;
 
   private ConfigManager(Builder builder) {
     this.baseDirectory = builder.baseDirectory;
@@ -76,7 +74,9 @@ public final class ConfigManager implements AutoCloseable {
    *     untouched
    * @throws IllegalStateException when the manager is closed
    */
-  public <T> ConfigHandle<T> load(Class<T> type) {
+  public synchronized <T> ConfigHandle<T> load(Class<T> type) {
+    // load() and close() share the manager monitor so a handle can never be created on a closed
+    // manager. Loads are rare and mostly happen during plugin startup; serializing them is fine.
     Objects.requireNonNull(type, "type");
     if (closed) {
       throw new IllegalStateException("configuration manager is closed");
@@ -108,7 +108,7 @@ public final class ConfigManager implements AutoCloseable {
    * Idempotent. Handles keep returning their last snapshot but can no longer reload.
    */
   @Override
-  public void close() {
+  public synchronized void close() {
     closed = true;
     for (DefaultConfigHandle<?> handle : handles.values()) {
       handle.close();

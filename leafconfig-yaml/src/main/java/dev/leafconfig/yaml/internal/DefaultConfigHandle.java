@@ -56,11 +56,12 @@ public final class DefaultConfigHandle<T> implements ConfigHandle<T> {
 
   @Override
   public ReloadResult<T> reload() {
-    if (closed) {
-      throw new IllegalStateException("configuration manager is closed");
-    }
     reloadLock.lock();
     try {
+      // Checked under the lock so a close() that acquired the lock first is always observed.
+      if (closed) {
+        throw new IllegalStateException("configuration handle is closed");
+      }
       ConfigLoader.Outcome<T> outcome;
       try {
         outcome = loader.load(schema, type, file);
@@ -92,9 +93,14 @@ public final class DefaultConfigHandle<T> implements ConfigHandle<T> {
     listeners.add(Objects.requireNonNull(listener, "listener"));
   }
 
-  /** Marks the handle closed and drops listeners. Idempotent. */
+  /** Marks the handle closed and drops listeners after any in-flight reload. Idempotent. */
   public void close() {
-    closed = true;
-    listeners.clear();
+    reloadLock.lock();
+    try {
+      closed = true;
+      listeners.clear();
+    } finally {
+      reloadLock.unlock();
+    }
   }
 }
