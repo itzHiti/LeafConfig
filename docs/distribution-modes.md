@@ -14,7 +14,7 @@ Gradle (Shadow, `com.gradleup.shadow`), as used by `leafconfig-example`:
 ```kotlin
 plugins { id("com.gradleup.shadow") version "9.6.1" }
 
-dependencies { implementation("io.github.itzhiti:leafconfig-paper:0.1.0") }
+dependencies { implementation("io.github.itzhiti:leafconfig-paper:0.1.1") }
 
 tasks.shadowJar {
     relocate("dev.leafconfig", "com.example.myplugin.libs.leafconfig")
@@ -41,17 +41,16 @@ Paper API and Adventure are `compileOnly` and must never be shaded.
 
 ## B. Paper `plugin.yml` `libraries:`
 
-Verified on 2026-09-21 with the published `0.1.0` artifacts on Paper 1.21.11
-(build 132): the no-shade example plugin (`./gradlew
-:leafconfig-example:runServerLibraries`) resolved `leafconfig-paper` and its
-transitive dependencies and passed the same 7-point smoke-test checklist as the
-shaded variant. The run used `repo1.maven.org` as the Central repository
-because the default Google mirror had not yet synchronized the new artifacts
-(see below); the default-mirror run is repeated once the mirror catches up.
+Verified with the published `0.1.0` artifacts on Paper 1.21.11 (build 132):
+the no-shade example plugin (`./gradlew :leafconfig-example:runServerLibraries`)
+resolved `leafconfig-paper` and its transitive dependencies and passed the same
+7-point smoke-test checklist as the shaded variant, both through
+`repo1.maven.org` (2026-09-21, while the default mirror lagged, see below) and
+through Paper's default Central mirror (2026-09-22).
 
 ```yaml
 libraries:
-  - io.github.itzhiti:leafconfig-paper:0.1.0
+  - io.github.itzhiti:leafconfig-paper:0.1.1
 ```
 
 Paper downloads the artifact and its dependencies and adds them to the

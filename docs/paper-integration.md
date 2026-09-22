@@ -54,7 +54,7 @@ example plugin installed. The EULA is accepted by the task's JVM flag.
 
 Checklist while the console is attached:
 
-1. Startup log contains `Enabling LeafConfigExample v0.1.0` and no stack trace.
+1. Startup log contains `Enabling LeafConfigExample v<project version>` and no stack trace.
 2. `run/plugins/LeafConfigExample/config.yml` equals the generated file shown in
    the README.
 3. Set `max-players: 500` in that file, run `leafconfigexample reload` in the
