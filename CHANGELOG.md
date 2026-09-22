@@ -7,6 +7,10 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.2.0] - 2026-09-22
+
 ### Added
 
 - Schema migrations: `@ConfigVersion(int)` stores the version as the top-level
