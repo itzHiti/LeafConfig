@@ -33,6 +33,8 @@ public final class ExamplePlugin extends JavaPlugin {
       getServer().getPluginManager().disablePlugin(this);
       return;
     }
+    // Non-fatal findings such as an assumed config-version on a file that predates versioning.
+    config.warnings().forEach(warning -> getLogger().warning(warning.toString()));
     config.onReload(current -> getLogger().info("Configuration reloaded"));
     MainConfig current = config.get();
     if (current.debug()) {

@@ -2,6 +2,7 @@ package dev.leafconfig.example;
 
 import dev.leafconfig.annotation.Comment;
 import dev.leafconfig.annotation.ConfigFile;
+import dev.leafconfig.annotation.ConfigVersion;
 import dev.leafconfig.annotation.NotBlank;
 import dev.leafconfig.annotation.Range;
 import java.time.Duration;
@@ -11,8 +12,13 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 
-/** Configuration of the example plugin; every field is persisted to {@code config.yml}. */
+/**
+ * Configuration of the example plugin; every field is persisted to {@code config.yml}. The version
+ * is stored as {@code config-version}; bump it and register a migration on the manager when a key
+ * moves.
+ */
 @ConfigFile("config.yml")
+@ConfigVersion(1)
 @Comment({"LeafConfig example plugin", "Edit and run /leafconfigexample reload"})
 public final class MainConfig {
 

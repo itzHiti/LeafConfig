@@ -2,7 +2,8 @@
 
 ```
 leafconfig-api      annotations, ConfigHandle, ReloadResult, diagnostics, ConfigNode,
-                    TypeAdapter/TypeAdapterFactory, ConfigValidator      (no YAML, no Paper)
+                    TypeAdapter/TypeAdapterFactory, ConfigValidator,
+                    migration (ConfigDocument, Migrations, ConfigDiff)   (no YAML, no Paper)
 leafconfig-yaml     ConfigManager + everything under dev.leafconfig.yaml.internal
 leafconfig-paper    LeafConfig.forPlugin, PaperAdapters                   (only Paper classes here)
 leafconfig-example  documentation plugin, shaded + relocated
@@ -15,17 +16,20 @@ leafconfig-example  documentation plugin, shaded + relocated
 | `internal.schema` | `ReflectionSchemaFactory` is the only code that touches `java.lang.reflect` for user models. Produces immutable `ConfigSchema` / `ObjectSchema` / `ConfigProperty` with a `PropertyAccessor` per field. A future annotation processor implements `SchemaFactory` and produces the same records. |
 | `internal.codec` | `AdapterRegistry` (manager-scoped, deterministic precedence, cycle detection for nested objects), built-in scalar adapters, enum/collection/map factories, `ObjectAdapter` for nested objects. |
 | `internal.decode` | `Decoder` (aggregating `DecodeContext`), `Encoder`, `ConstraintValidator`, `DiagnosticCollector`. |
-| `internal.yaml` | The only package importing SnakeYAML Engine: `YamlDocument` (parse settings, style detection), `NodeConverter` (SnakeYAML nodes to `ConfigNode` with safety checks and back), `DocumentMerger`, `YamlRenderer`. |
+| `internal.yaml` | The only package importing SnakeYAML Engine: `YamlDocument` (parse settings, style detection), `NodeConverter` (SnakeYAML nodes to `ConfigNode` with safety checks and back), `DocumentMerger`, `YamlConfigDocument` (the `ConfigDocument` handed to migration steps), `YamlRenderer`. |
+| `internal.migration` | `MigrationRunner`: reads `config-version`, applies steps and `@FormerlyKnownAs` renames to the in-memory tree, stamps the version. |
 | `internal.io` | `SafePaths` (containment, symlink check), `AtomicFiles`. |
 | `internal` | `ConfigLoader` pipeline, `DefaultConfigHandle`, `LoadFailure`. |
 
-Public surface of the module: `ConfigManager`, `ConfigManager.Builder`,
-`YamlLimits`. Everything under `internal` may change without notice.
+Public surface of the module: `ConfigManager` (including `previewMigration`),
+`ConfigManager.Builder`, `YamlLimits`. Everything under `internal` may change
+without notice.
 
 ## Compatibility policy before 1.0
 
 Public packages are `dev.leafconfig`, `dev.leafconfig.annotation`,
 `dev.leafconfig.adapter`, `dev.leafconfig.node`, `dev.leafconfig.validation`,
+`dev.leafconfig.migration`,
 `dev.leafconfig.yaml` (only `ConfigManager`, `ConfigManager.Builder`,
 `YamlLimits`) and `dev.leafconfig.paper`. Everything under `internal` may change
 in any release.

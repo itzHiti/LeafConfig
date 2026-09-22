@@ -16,13 +16,17 @@ representations exist:
    Existing file: check size, decode strictly as UTF-8, parse with comments,
    duplicate keys rejected, anchors/aliases and non-core tags rejected, limits
    applied.
-4. Decode every known key, collecting every error.
-5. Apply `@Required`, `@NotBlank`, `@Range`, `@Pattern`, then programmatic
+4. Versioned types: read `config-version`, apply the registered migration
+   steps to the in-memory tree, stamp the version; then apply
+   `@FormerlyKnownAs` renames (see [migrations.md](migrations.md)).
+5. Decode every known key, collecting every error.
+6. Apply `@Required`, `@NotBlank`, `@Range`, `@Pattern`, then programmatic
    validators.
-6. Any error: fail, file and current snapshot untouched.
-7. Merge missing keys and schema comments into the document.
-8. Write only if the merge changed something.
-9. Publish the instance.
+7. Any error: fail, file and current snapshot untouched.
+8. Merge missing keys and schema comments into the document.
+9. If a step or rename changed data, write `<file>.bak` (default policy), then
+   write the file; write only if something changed.
+10. Publish the instance.
 
 ## Merge rules
 
@@ -44,6 +48,7 @@ and `expected.yml` after one load):
 | A file that contains only comments keeps them verbatim, followed by a blank line and the generated content | `comments-only` |
 | Malformed YAML and duplicate keys leave the file byte for byte untouched | `GoldenFileTest` |
 | Unchanged documents are not rewritten | `ConfigManagerTest.unchangedDocumentIsNotRewritten` |
+| Migrated and renamed entries keep their comments; `config-version` goes first or right after the header comment | `golden/migration/*` |
 
 ## Known limitations
 

@@ -11,6 +11,8 @@
   previous snapshot stays active and the file is not touched.
 - `ReloadResult` carries `successful()`, `current()` (the active snapshot after
   the call) and `diagnostics()`.
+- `warnings()` returns the warnings of the load that published the current
+  snapshot (for example `VERSION_ASSUMED`); it is empty after a clean load.
 - Concurrent `reload()` calls on one handle are serialized with a lock; each
   caller gets the result of its own run.
 - Listeners registered with `onReload` run on the reloading thread after

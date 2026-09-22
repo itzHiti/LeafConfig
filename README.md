@@ -189,6 +189,37 @@ Invalid configuration: plugins/Example/config.yml
 Every independent error is reported in one pass. Codes are stable
 (`DiagnosticCodes`), messages are not.
 
+## Schema migrations
+
+Renaming or moving keys between plugin versions must not destroy administrator
+files. Declare a version and register sequential steps:
+
+```java
+@ConfigFile("config.yml")
+@ConfigVersion(2)
+public final class MainConfig {
+  @FormerlyKnownAs("motd")          // simple rename, handled without a step
+  private String greeting = "Welcome!";
+  private Database database = new Database();
+}
+
+ConfigManager manager = ConfigManager.builder(dir)
+    .migrations(MainConfig.class, m -> m
+        .from(1).to(2, doc -> {
+          doc.rename("mysql.ip", "database.host");   // value and comments move along
+          doc.remove("mysql");
+        }))
+    .build();
+```
+
+The version lives in the file as `config-version`. A load migrates an older
+file in memory, decodes and validates the result, writes `<file>.bak`, then
+replaces the file atomically; if anything fails, file and active snapshot stay
+untouched. Newer files are rejected, never downgraded. A file without the key is
+treated as version 1 with a `VERSION_ASSUMED` warning. Use
+`manager.previewMigration(MainConfig.class)` for a dry run with a diff. Details
+and guarantees: [docs/migrations.md](docs/migrations.md).
+
 ## Supported types
 
 | Type | YAML | Notes |
@@ -257,7 +288,8 @@ Shade and `libraries:` examples.
 - Example plugin: [`leafconfig-example`](leafconfig-example) (shaded, relocated
   jar built by `./gradlew :leafconfig-example:shadowJar`)
 - [Getting started](docs/getting-started.md), [Annotations](docs/annotations.md),
-  [Reload](docs/reload.md), [Paper integration](docs/paper-integration.md),
+  [Reload](docs/reload.md), [Migrations](docs/migrations.md),
+  [Paper integration](docs/paper-integration.md),
   [Architecture](docs/architecture.md), [Benchmarks](docs/benchmarks.md)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md). Quality gate:
   `./gradlew clean check`.

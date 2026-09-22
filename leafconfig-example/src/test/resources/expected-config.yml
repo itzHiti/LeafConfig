@@ -1,6 +1,6 @@
 # LeafConfig example plugin
 # Edit and run /leafconfigexample reload
-
+config-version: 1
 # Enable verbose diagnostic messages
 debug: false
 # Maximum number of players allowed to use the reward

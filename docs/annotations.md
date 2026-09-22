@@ -12,12 +12,13 @@ All annotations live in `dev.leafconfig.annotation` and have runtime retention.
 | `@NotBlank` | `CharSequence` field | Empty or whitespace-only values fail with `BLANK`. |
 | `@Range(min, max)` | numeric field | Inclusive bounds, compared exactly as decimals. `OUT_OF_RANGE`. |
 | `@Pattern(String)` | `CharSequence` field | Whole value must match. Compiled at discovery; `PATTERN_MISMATCH`. |
+| `@ConfigVersion(int)` | type | Schema version, at least 1, stored as `config-version`. Enables migrations; see [migrations.md](migrations.md). |
+| `@FormerlyKnownAs(String...)` | field | Former keys in the same mapping. A lone former key is renamed in place with its comments; conflicts fail with `RENAME_CONFLICT`. |
 
 Misplaced validation annotations (for example `@NotBlank` on an `int`) are a
 model error, not a runtime warning.
 
-Reserved for later releases and intentionally absent: `@ConfigVersion`,
-`@Aliases`, `@Secret`.
+Reserved for later releases and intentionally absent: `@Secret`.
 
 ## Programmatic validators
 

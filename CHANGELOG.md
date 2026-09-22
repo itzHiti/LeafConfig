@@ -7,7 +7,32 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- Schema migrations: `@ConfigVersion(int)` stores the version as the top-level
+  `config-version` key; `ConfigManager.Builder.migrations(Class, m -> m.from(n).to(n + 1, step))`
+  registers sequential steps operating on a `ConfigDocument`
+  (`get`, `contains`, `set`, `setIfMissing`, `remove`, `rename`, `root`).
+  Older files are migrated in memory, decoded, validated, backed up and then
+  replaced atomically; newer files are rejected (`VERSION_TOO_NEW`); a file
+  without the key is treated as version 1 (`VERSION_ASSUMED` warning).
+- `@FormerlyKnownAs(String...)` renames a lone former key in place, keeping
+  value, comments and position; ambiguous files fail with `RENAME_CONFLICT`.
+- `BackupPolicy` (`BEFORE_MIGRATION` default, `NONE`) via
+  `ConfigManager.Builder.backupPolicy`; at most one `<file>.bak`.
+- `ConfigManager.previewMigration(Class)` dry run returning a
+  `MigrationPreview` with versions, diagnostics and a `ConfigDiff` renderer.
+- `ConfigHandle.warnings()`: warnings of the load that published the current
+  snapshot.
+- New diagnostic codes: `VERSION_ASSUMED`, `VERSION_TOO_NEW`,
+  `MIGRATION_MISSING`, `MIGRATION_FAILED`, `RENAME_CONFLICT`.
+- `leafconfig-example`: `MainConfig` is `@ConfigVersion(1)`; the generated
+  `config.yml` now starts with `config-version: 1`.
+
+### Changed
+
+- `ConfigHandle` gained the abstract method `warnings()`; third-party
+  implementations of the interface must add it.
 
 ## [0.1.1] - 2026-09-21
 
