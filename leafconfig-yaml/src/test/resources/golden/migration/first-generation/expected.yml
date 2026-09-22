@@ -1,0 +1,13 @@
+# Versioned fixture configuration
+config-version: 3
+# Enable debug output
+debug: false
+# Greeting shown on join
+greeting: Welcome!
+# Database settings
+database:
+  host: localhost
+  port: 5432
+  # Connections kept open
+  pool-size: 5
+timeout: 30s

@@ -1,0 +1,12 @@
+config-version: 3 # written by the plugin
+# Enable debug output
+debug: false
+# Greeting shown on join
+greeting: Hello
+# Database settings
+database:
+  host: db.internal
+  port: 5432
+  # Connections kept open
+  pool-size: 10
+timeout: 30s

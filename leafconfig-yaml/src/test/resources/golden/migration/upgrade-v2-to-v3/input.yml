@@ -1,0 +1,6 @@
+config-version: 2 # written by the plugin
+debug: false
+greeting: Hello
+database:
+  host: db.internal
+  port: 5432

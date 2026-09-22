@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
  * @param type declared generic type
  * @param rawType erased type, primitive for primitive fields
  * @param comments schema comment lines, possibly empty
+ * @param formerKeys former keys from {@code @FormerlyKnownAs}, possibly empty
  * @param required whether {@code @Required} is present
  * @param notBlank whether {@code @NotBlank} is present
  * @param range inclusive bounds, or {@code null}
@@ -25,6 +26,7 @@ public record ConfigProperty(
     Type type,
     Class<?> rawType,
     List<String> comments,
+    List<String> formerKeys,
     boolean required,
     boolean notBlank,
     Bounds range,
@@ -32,10 +34,11 @@ public record ConfigProperty(
     PropertyAccessor accessor,
     TypeAdapter<Object> adapter) {
 
-  /** Copies the comment list. */
+  /** Copies the lists. */
   public ConfigProperty {
     Objects.requireNonNull(key, "key");
     comments = List.copyOf(comments);
+    formerKeys = List.copyOf(formerKeys);
   }
 
   /**

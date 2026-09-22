@@ -65,5 +65,20 @@ public final class DiagnosticCodes {
   /** A reload listener threw; the new snapshot was already published. */
   public static final String LISTENER_FAILED = "LISTENER_FAILED";
 
+  /** A versioned file has no {@code config-version} key; version 1 was assumed. Warning. */
+  public static final String VERSION_ASSUMED = "VERSION_ASSUMED";
+
+  /** The stored version is newer than the version the type declares; downgrades are rejected. */
+  public static final String VERSION_TOO_NEW = "VERSION_TOO_NEW";
+
+  /** No migration is registered for a step on the path from the stored to the current version. */
+  public static final String MIGRATION_MISSING = "MIGRATION_MISSING";
+
+  /** A migration step threw; nothing was written. */
+  public static final String MIGRATION_FAILED = "MIGRATION_FAILED";
+
+  /** A key and one of its former names, or two former names, are present at the same time. */
+  public static final String RENAME_CONFLICT = "RENAME_CONFLICT";
+
   private DiagnosticCodes() {}
 }

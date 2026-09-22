@@ -1,0 +1,13 @@
+# Administrator header, must stay on top
+debug: true
+config-version: 3
+# Greeting shown on join
+greeting: "Hi there"
+custom-flag: keep-me
+# Database settings
+database:
+  host: 10.0.0.1 # primary
+  port: 3306
+  # Connections kept open
+  pool-size: 10
+timeout: 30s

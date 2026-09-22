@@ -1,6 +1,7 @@
 package dev.leafconfig;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -21,6 +22,12 @@ public interface ConfigHandle<T> {
 
   /** Returns the resolved file path. */
   Path file();
+
+  /**
+   * Returns the warnings reported by the load that published the current snapshot, for example
+   * {@link DiagnosticCodes#VERSION_ASSUMED}. Never contains errors; empty when the load was clean.
+   */
+  List<ConfigDiagnostic> warnings();
 
   /**
    * Re-reads the file and publishes a new snapshot only if parsing, decoding, validation and any

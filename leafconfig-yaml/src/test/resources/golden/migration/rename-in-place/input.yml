@@ -1,0 +1,9 @@
+config-version: 3
+debug: false
+# The greeting, formerly called motd
+motd: Hello   # inline note
+database:
+  host: localhost
+  port: 5432
+  pool-size: 7
+timeout: 1m

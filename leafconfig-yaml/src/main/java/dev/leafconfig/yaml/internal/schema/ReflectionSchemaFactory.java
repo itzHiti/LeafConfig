@@ -8,6 +8,8 @@ import dev.leafconfig.adapter.TypeAdapter;
 import dev.leafconfig.adapter.TypeAdapterLookup;
 import dev.leafconfig.annotation.Comment;
 import dev.leafconfig.annotation.ConfigFile;
+import dev.leafconfig.annotation.ConfigVersion;
+import dev.leafconfig.annotation.FormerlyKnownAs;
 import dev.leafconfig.annotation.Ignore;
 import dev.leafconfig.annotation.Key;
 import dev.leafconfig.annotation.NotBlank;
@@ -34,7 +36,8 @@ import java.util.regex.PatternSyntaxException;
  *
  * <p>Rules enforced here: instance fields are persisted unless static, transient, synthetic or
  * {@code @Ignore}; final fields, inherited persisted fields, duplicate keys, invalid {@code @Key}
- * values and misplaced validation annotations are rejected with {@link
+ * or {@code @FormerlyKnownAs} values, misplaced validation annotations, a {@code @ConfigVersion}
+ * below 1 and a property under the reserved version key are rejected with {@link
  * DiagnosticCodes#INVALID_MODEL} diagnostics.
  */
 public final class ReflectionSchemaFactory implements SchemaFactory {
@@ -82,7 +85,27 @@ public final class ReflectionSchemaFactory implements SchemaFactory {
               ConfigDiagnostic.error(
                   ConfigPath.root(), DiagnosticCodes.INVALID_MODEL, "@ConfigFile value is blank")));
     }
-    return new ConfigSchema(objectSchema(type), file.value());
+    ConfigVersion versionAnnotation = type.getAnnotation(ConfigVersion.class);
+    int version = versionAnnotation == null ? 0 : versionAnnotation.value();
+    if (versionAnnotation != null && version < 1) {
+      throw new ConfigModelException(
+          type, List.of(invalid("", "@ConfigVersion must be at least 1, got " + version)));
+    }
+    ObjectSchema root = objectSchema(type);
+    if (versionAnnotation != null) {
+      for (ConfigProperty property : root.properties()) {
+        if (property.key().equals(ConfigVersion.KEY)
+            || property.formerKeys().contains(ConfigVersion.KEY)) {
+          throw new ConfigModelException(
+              type,
+              List.of(
+                  invalid(
+                      ConfigVersion.KEY,
+                      "key '" + ConfigVersion.KEY + "' is reserved for @ConfigVersion")));
+        }
+      }
+    }
+    return new ConfigSchema(root, file.value(), version);
   }
 
   @Override
@@ -108,6 +131,19 @@ public final class ReflectionSchemaFactory implements SchemaFactory {
                       + "' resolved from field '"
                       + field.getName()
                       + "'"));
+        }
+        for (String former : property.formerKeys()) {
+          if (!keys.add(former)) {
+            problems.add(
+                invalid(
+                    property.key(),
+                    "former key '"
+                        + former
+                        + "' of field '"
+                        + field.getName()
+                        + "' clashes with another key of "
+                        + type.getSimpleName()));
+          }
         }
         properties.add(property);
       }
@@ -203,6 +239,24 @@ public final class ReflectionSchemaFactory implements SchemaFactory {
       return null;
     }
 
+    List<String> formerKeys = List.of();
+    FormerlyKnownAs formerly = field.getAnnotation(FormerlyKnownAs.class);
+    if (formerly != null) {
+      formerKeys = new ArrayList<>();
+      for (String former : formerly.value()) {
+        String formerProblem = KeyNaming.validate(former);
+        if (formerProblem != null) {
+          problems.add(invalid(key, "invalid former key '" + former + "': " + formerProblem));
+        } else if (former.equals(key)) {
+          problems.add(invalid(key, "former key '" + former + "' equals the current key"));
+        } else if (formerKeys.contains(former)) {
+          problems.add(invalid(key, "former key '" + former + "' is listed twice"));
+        } else {
+          formerKeys.add(former);
+        }
+      }
+    }
+
     Class<?> rawType = field.getType();
     boolean charSequence = CharSequence.class.isAssignableFrom(rawType);
     boolean notBlank = field.isAnnotationPresent(NotBlank.class);
@@ -259,6 +313,7 @@ public final class ReflectionSchemaFactory implements SchemaFactory {
         field.getGenericType(),
         rawType,
         comments(field.getAnnotation(Comment.class)),
+        formerKeys,
         field.isAnnotationPresent(Required.class),
         notBlank,
         range,

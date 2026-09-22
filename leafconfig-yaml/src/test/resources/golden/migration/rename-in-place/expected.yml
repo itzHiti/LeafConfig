@@ -1,0 +1,12 @@
+config-version: 3
+# Enable debug output
+debug: false
+# The greeting, formerly called motd
+greeting: Hello # inline note
+# Database settings
+database:
+  host: localhost
+  port: 5432
+  # Connections kept open
+  pool-size: 7
+timeout: 1m

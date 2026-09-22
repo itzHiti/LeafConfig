@@ -20,28 +20,40 @@ import java.util.function.Consumer;
  */
 public final class DefaultConfigHandle<T> implements ConfigHandle<T> {
 
+  /** Instance and the warnings of the load that produced it, published together. */
+  private record Snapshot<T>(T value, List<ConfigDiagnostic> warnings) {}
+
   private final Class<T> type;
   private final Path file;
   private final ConfigSchema schema;
   private final ConfigLoader loader;
   private final ReentrantLock reloadLock = new ReentrantLock();
   private final List<Consumer<? super T>> listeners = new CopyOnWriteArrayList<>();
-  private volatile T current;
+  private volatile Snapshot<T> current;
   private volatile boolean closed;
 
   /** Creates a handle around an already loaded snapshot. */
   public DefaultConfigHandle(
-      Class<T> type, Path file, ConfigSchema schema, ConfigLoader loader, T initial) {
+      Class<T> type,
+      Path file,
+      ConfigSchema schema,
+      ConfigLoader loader,
+      ConfigLoader.Outcome<T> initial) {
     this.type = type;
     this.file = file;
     this.schema = schema;
     this.loader = loader;
-    this.current = Objects.requireNonNull(initial, "initial");
+    this.current = snapshot(initial);
+  }
+
+  private static <T> Snapshot<T> snapshot(ConfigLoader.Outcome<T> outcome) {
+    return new Snapshot<>(
+        Objects.requireNonNull(outcome.instance(), "instance"), List.copyOf(outcome.warnings()));
   }
 
   @Override
   public T get() {
-    return current;
+    return current.value();
   }
 
   @Override
@@ -52,6 +64,11 @@ public final class DefaultConfigHandle<T> implements ConfigHandle<T> {
   @Override
   public Path file() {
     return file;
+  }
+
+  @Override
+  public List<ConfigDiagnostic> warnings() {
+    return current.warnings();
   }
 
   @Override
@@ -66,14 +83,14 @@ public final class DefaultConfigHandle<T> implements ConfigHandle<T> {
       try {
         outcome = loader.load(schema, type, file);
       } catch (LoadFailure failure) {
-        return ReloadResult.failure(current, failure.diagnostics());
+        return ReloadResult.failure(current.value(), failure.diagnostics());
       }
-      T snapshot = outcome.instance();
+      Snapshot<T> snapshot = snapshot(outcome);
       current = snapshot;
-      List<ConfigDiagnostic> diagnostics = new ArrayList<>(outcome.warnings());
+      List<ConfigDiagnostic> diagnostics = new ArrayList<>(snapshot.warnings());
       for (Consumer<? super T> listener : listeners) {
         try {
-          listener.accept(snapshot);
+          listener.accept(snapshot.value());
         } catch (RuntimeException e) {
           diagnostics.add(
               ConfigDiagnostic.warning(
@@ -82,7 +99,7 @@ public final class DefaultConfigHandle<T> implements ConfigHandle<T> {
                   "reload listener " + listener.getClass().getName() + " threw " + e));
         }
       }
-      return ReloadResult.success(snapshot, diagnostics);
+      return ReloadResult.success(snapshot.value(), diagnostics);
     } finally {
       reloadLock.unlock();
     }

@@ -1,10 +1,16 @@
 package dev.leafconfig.yaml;
 
+import dev.leafconfig.ConfigDiagnostic;
 import dev.leafconfig.ConfigHandle;
 import dev.leafconfig.ConfigLoadException;
 import dev.leafconfig.ConfigModelException;
+import dev.leafconfig.ConfigPath;
+import dev.leafconfig.DiagnosticCodes;
 import dev.leafconfig.adapter.TypeAdapter;
 import dev.leafconfig.adapter.TypeAdapterFactory;
+import dev.leafconfig.migration.BackupPolicy;
+import dev.leafconfig.migration.MigrationPreview;
+import dev.leafconfig.migration.Migrations;
 import dev.leafconfig.validation.ConfigValidator;
 import dev.leafconfig.yaml.internal.ConfigLoader;
 import dev.leafconfig.yaml.internal.DefaultConfigHandle;
@@ -22,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * Loads annotated configuration classes from YAML files inside one base directory.
@@ -41,6 +48,7 @@ public final class ConfigManager implements AutoCloseable {
   private final AdapterRegistry adapters;
   private final SchemaFactory schemaFactory;
   private final ConfigLoader loader;
+  private final Map<Class<?>, Migrations> migrations;
   private final Map<Class<?>, ConfigSchema> schemas = new HashMap<>();
   private final Map<Class<?>, DefaultConfigHandle<?>> handles = new HashMap<>();
   private boolean closed;
@@ -51,7 +59,14 @@ public final class ConfigManager implements AutoCloseable {
         new AdapterRegistry(builder.userAdapters, builder.moduleAdapters, builder.factories);
     this.schemaFactory = new ReflectionSchemaFactory(adapters);
     adapters.attachSchemaFactory(schemaFactory);
-    this.loader = new ConfigLoader(adapters, builder.limits, Map.copyOf(builder.validators));
+    this.migrations = Map.copyOf(builder.migrations);
+    this.loader =
+        new ConfigLoader(
+            adapters,
+            builder.limits,
+            Map.copyOf(builder.validators),
+            migrations,
+            builder.backupPolicy);
   }
 
   /** Starts building a manager whose files live inside {@code baseDirectory}. */
@@ -87,10 +102,7 @@ public final class ConfigManager implements AutoCloseable {
   }
 
   private <T> DefaultConfigHandle<T> createHandle(Class<T> type) {
-    ConfigSchema schema;
-    synchronized (schemas) {
-      schema = schemas.computeIfAbsent(type, schemaFactory::create);
-    }
+    ConfigSchema schema = schema(type);
     Path file;
     ConfigLoader.Outcome<T> outcome;
     try {
@@ -100,7 +112,68 @@ public final class ConfigManager implements AutoCloseable {
       throw new ConfigLoadException(
           baseDirectory.resolve(schema.fileName()), failure.diagnostics());
     }
-    return new DefaultConfigHandle<>(type, file, schema, loader, outcome.instance());
+    return new DefaultConfigHandle<>(type, file, schema, loader, outcome);
+  }
+
+  /**
+   * Runs the load pipeline for {@code type} without writing the file or publishing a snapshot and
+   * reports what a real load would change: migration steps, renames, the version key and missing
+   * defaults. Safe to call whether or not the type is loaded.
+   *
+   * @throws ConfigModelException when {@code type} is not a valid configuration model
+   * @throws ConfigLoadException when the configured file name is unsafe
+   * @throws IllegalStateException when the manager is closed
+   */
+  public synchronized MigrationPreview previewMigration(Class<?> type) {
+    Objects.requireNonNull(type, "type");
+    if (closed) {
+      throw new IllegalStateException("configuration manager is closed");
+    }
+    ConfigSchema schema = schema(type);
+    Path file;
+    try {
+      file = SafePaths.resolve(baseDirectory, schema.fileName());
+    } catch (LoadFailure failure) {
+      throw new ConfigLoadException(
+          baseDirectory.resolve(schema.fileName()), failure.diagnostics());
+    }
+    return loader.preview(schema, type, file);
+  }
+
+  private ConfigSchema schema(Class<?> type) {
+    synchronized (schemas) {
+      return schemas.computeIfAbsent(type, this::discover);
+    }
+  }
+
+  /** Discovers the schema and checks the registered migrations against its version. */
+  private ConfigSchema discover(Class<?> type) {
+    ConfigSchema schema = schemaFactory.create(type);
+    Migrations registered = migrations.get(type);
+    if (registered == null) {
+      return schema;
+    }
+    List<ConfigDiagnostic> problems = new ArrayList<>();
+    if (!schema.versioned()) {
+      problems.add(
+          ConfigDiagnostic.error(
+              ConfigPath.root(),
+              DiagnosticCodes.INVALID_MODEL,
+              "migrations are registered but the type has no @ConfigVersion"));
+    } else if (registered.highestTarget() > schema.version()) {
+      problems.add(
+          ConfigDiagnostic.error(
+              ConfigPath.root(),
+              DiagnosticCodes.INVALID_MODEL,
+              "a migration targets version "
+                  + registered.highestTarget()
+                  + " but @ConfigVersion is "
+                  + schema.version()));
+    }
+    if (!problems.isEmpty()) {
+      throw new ConfigModelException(type, problems);
+    }
+    return schema;
   }
 
   /**
@@ -128,7 +201,9 @@ public final class ConfigManager implements AutoCloseable {
     private final Map<Type, TypeAdapter<?>> moduleAdapters = new LinkedHashMap<>();
     private final List<TypeAdapterFactory> factories = new ArrayList<>();
     private final Map<Class<?>, List<ConfigValidator<?>>> validators = new HashMap<>();
+    private final Map<Class<?>, Migrations> migrations = new HashMap<>();
     private YamlLimits limits = YamlLimits.DEFAULT;
+    private BackupPolicy backupPolicy = BackupPolicy.BEFORE_MIGRATION;
 
     private Builder(Path baseDirectory) {
       this.baseDirectory = Objects.requireNonNull(baseDirectory, "baseDirectory");
@@ -173,6 +248,38 @@ public final class ConfigManager implements AutoCloseable {
       validators
           .computeIfAbsent(Objects.requireNonNull(type, "type"), t -> new ArrayList<>())
           .add(Objects.requireNonNull(validator, "validator"));
+      return this;
+    }
+
+    /**
+     * Registers the sequential migration steps for a {@code @ConfigVersion} type:
+     *
+     * <pre>{@code
+     * .migrations(MainConfig.class, m -> m
+     *     .from(1).to(2, doc -> doc.rename("mysql.ip", "database.host"))
+     *     .from(2).to(3, doc -> doc.setIfMissing("database.pool-size", 10)))
+     * }</pre>
+     *
+     * <p>Steps are validated against the type's version when it is first loaded: a type without
+     * {@code @ConfigVersion} or a step beyond the declared version is a model error.
+     *
+     * @throws IllegalArgumentException when migrations for {@code type} were already registered
+     */
+    public Builder migrations(Class<?> type, Consumer<Migrations> steps) {
+      Objects.requireNonNull(type, "type");
+      Objects.requireNonNull(steps, "steps");
+      Migrations set = new Migrations();
+      steps.accept(set);
+      if (migrations.putIfAbsent(type, set) != null) {
+        throw new IllegalArgumentException(
+            "migrations for " + type.getName() + " are already registered");
+      }
+      return this;
+    }
+
+    /** Replaces the default {@link BackupPolicy#BEFORE_MIGRATION}. */
+    public Builder backupPolicy(BackupPolicy policy) {
+      this.backupPolicy = Objects.requireNonNull(policy, "policy");
       return this;
     }
 

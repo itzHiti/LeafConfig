@@ -1,0 +1,8 @@
+# Administrator header, must stay on top
+debug: true
+# Old database section
+mysql:
+  ip: 10.0.0.1 # primary
+  port: 3306
+motd: "Hi there"
+custom-flag: keep-me
