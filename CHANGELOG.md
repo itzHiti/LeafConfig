@@ -7,6 +7,10 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.2.1] - 2026-09-23
+
 ### Fixed
 
 - Sections inside `Map<String, Section>` values and `List`/`Set` elements now
