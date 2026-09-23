@@ -113,6 +113,16 @@ class YamlConfigDocumentTest {
   }
 
   @Test
+  void renameIntoItsOwnSubtreeIsRejectedAndLeavesTheTreeIntact() {
+    parse(TEXT);
+    // Moving a mapping below itself would make it contain itself.
+    assertThatThrownBy(() -> editable.rename("section", "section.inner"))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("into itself");
+    assertThat(document.render()).isEqualTo(TEXT);
+  }
+
+  @Test
   void invalidPathsAndValuesAreRejected() {
     parse(TEXT);
     assertThatThrownBy(() -> editable.get("")).isInstanceOf(IllegalArgumentException.class);

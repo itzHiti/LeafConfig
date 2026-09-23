@@ -7,6 +7,7 @@ import dev.leafconfig.annotation.ConfigVersion;
 import dev.leafconfig.migration.Migration;
 import dev.leafconfig.migration.Migrations;
 import dev.leafconfig.node.ConfigNode;
+import dev.leafconfig.node.SourceLocation;
 import dev.leafconfig.yaml.YamlLimits;
 import dev.leafconfig.yaml.internal.codec.ObjectAdapter;
 import dev.leafconfig.yaml.internal.codec.Scalars;
@@ -72,6 +73,7 @@ public final class MigrationRunner {
       MappingNode root = document.root();
       int index = YamlConfigDocument.indexOf(root, ConfigVersion.KEY);
       ConfigPath path = ConfigPath.of(ConfigVersion.KEY);
+      SourceLocation versionSource = null;
       if (document.isGenerated()) {
         stored = schema.version();
       } else if (index < 0) {
@@ -84,6 +86,7 @@ public final class MigrationRunner {
       } else {
         ConfigNode value =
             ((dev.leafconfig.node.MappingNode) before).entries().get(ConfigVersion.KEY);
+        versionSource = value.source();
         BigInteger parsed;
         try {
           parsed = Scalars.parseInteger(value, "version");
@@ -111,7 +114,7 @@ public final class MigrationRunner {
                 + " but this build supports version "
                 + schema.version()
                 + "; downgrades are not supported",
-            null);
+            versionSource);
         return new Result(stored, false, false);
       }
       if (stored < schema.version()) {
@@ -124,17 +127,19 @@ public final class MigrationRunner {
                 path,
                 DiagnosticCodes.MIGRATION_MISSING,
                 "no migration registered from version " + version + " to " + (version + 1),
-                null);
+                versionSource);
             return new Result(stored, true, true);
           }
+          // Exception, not RuntimeException: Kotlin and other JVM languages throw checked
+          // exceptions from lambdas, and a step failure must never escape load() or reload().
           try {
             step.apply(editable);
-          } catch (RuntimeException e) {
+          } catch (Exception e) {
             collector.error(
                 path,
                 DiagnosticCodes.MIGRATION_FAILED,
                 "migration from version " + version + " to " + (version + 1) + " failed: " + e,
-                null);
+                versionSource);
             return new Result(stored, true, true);
           }
         }
@@ -195,13 +200,13 @@ public final class MigrationRunner {
               keyPath,
               DiagnosticCodes.RENAME_CONFLICT,
               "both '" + property.key() + "' and former key '" + present.get(0) + "' are present",
-              null);
+              YamlConfigDocument.keyLocation(mapping, present.get(0)));
         } else if (present.size() > 1) {
           collector.error(
               keyPath,
               DiagnosticCodes.RENAME_CONFLICT,
               "several former keys of '" + property.key() + "' are present: " + present,
-              null);
+              YamlConfigDocument.keyLocation(mapping, present.get(1)));
         } else if (present.size() == 1) {
           YamlConfigDocument.renameInPlace(mapping, present.get(0), property.key());
           changed = true;

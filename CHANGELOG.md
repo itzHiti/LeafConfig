@@ -7,7 +7,22 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- Sections inside `Map<String, Section>` values and `List`/`Set` elements now
+  receive keys added to the section class, like top-level nested sections.
+  Entries get missing keys only, no schema comments, matching generated
+  entries. Previously such entries silently kept using Java defaults without
+  showing the new keys.
+- `ConfigDocument.rename(from, to)` with `to` inside `from` (for example
+  `rename("a", "a.b")`) made a mapping contain itself and overflowed the stack
+  while rendering; it now throws `IllegalArgumentException`, reported as
+  `MIGRATION_FAILED`.
+- A migration step throwing a checked exception (possible from Kotlin or with
+  sneaky throws) escaped `load()`/`reload()` instead of becoming
+  `MIGRATION_FAILED`.
+- `VERSION_TOO_NEW`, `MIGRATION_MISSING`, `MIGRATION_FAILED` and
+  `RENAME_CONFLICT` diagnostics now carry the source line.
 
 ## [0.2.0] - 2026-09-22
 

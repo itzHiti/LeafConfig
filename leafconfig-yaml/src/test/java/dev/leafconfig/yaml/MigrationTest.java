@@ -197,6 +197,71 @@ class MigrationTest {
     }
   }
 
+  /** Kotlin and other JVM languages can throw checked exceptions from a lambda. */
+  @Test
+  void checkedExceptionFromStepIsReportedNotThrown() throws IOException {
+    Files.writeString(file(), "config-version: 3\n");
+    try (ConfigManager manager =
+        ConfigManager.builder(base)
+            .migrations(
+                VersionedConfig.class,
+                m ->
+                    m.from(1)
+                        .to(2, d -> {})
+                        .from(2)
+                        .to(3, d -> sneakyThrow(new IOException("disk says no"))))
+            .build()) {
+      ConfigHandle<VersionedConfig> handle = manager.load(VersionedConfig.class);
+      String v2 = "config-version: 2\n";
+      Files.writeString(file(), v2);
+      ReloadResult<VersionedConfig> result = handle.reload();
+      assertThat(result.successful()).isFalse();
+      assertThat(result.diagnostics())
+          .singleElement()
+          .satisfies(
+              d -> {
+                assertThat(d.code()).isEqualTo(DiagnosticCodes.MIGRATION_FAILED);
+                assertThat(d.message()).contains("disk says no");
+                assertThat(d.line()).isEqualTo(1);
+              });
+      assertThat(Files.readString(file())).isEqualTo(v2);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <E extends Throwable> void sneakyThrow(Throwable e) throws E {
+    throw (E) e;
+  }
+
+  @Test
+  void versionAndRenameDiagnosticsCarrySourceLines() throws IOException {
+    Files.writeString(file(), "debug: true\nconfig-version: 9\n");
+    try (ConfigManager manager = builder().build()) {
+      assertThatThrownBy(() -> manager.load(VersionedConfig.class))
+          .isInstanceOf(ConfigLoadException.class)
+          .satisfies(
+              e ->
+                  assertThat(((ConfigLoadException) e).diagnostics())
+                      .singleElement()
+                      .extracting(ConfigDiagnostic::line)
+                      .isEqualTo(2));
+    }
+    Files.writeString(file(), "config-version: 3\ngreeting: a\nmotd: b\n");
+    try (ConfigManager manager = builder().build()) {
+      assertThatThrownBy(() -> manager.load(VersionedConfig.class))
+          .isInstanceOf(ConfigLoadException.class)
+          .satisfies(
+              e ->
+                  assertThat(((ConfigLoadException) e).diagnostics())
+                      .singleElement()
+                      .satisfies(
+                          d -> {
+                            assertThat(d.code()).isEqualTo(DiagnosticCodes.RENAME_CONFLICT);
+                            assertThat(d.line()).isEqualTo(3);
+                          }));
+    }
+  }
+
   @Test
   void invalidVersionScalarIsReported() throws IOException {
     for (String text : List.of("config-version: two\n", "config-version: 0\n")) {

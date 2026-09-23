@@ -106,6 +106,9 @@ public final class YamlConfigDocument implements ConfigDocument {
     if (sourceIndex < 0) {
       return false;
     }
+    if (to.startsWith(from + ".")) {
+      throw new IllegalArgumentException("cannot move '" + from + "' into itself ('" + to + "')");
+    }
     if (tuple(to) != null) {
       throw new IllegalArgumentException(
           "cannot rename '" + from + "': '" + to + "' already exists");
@@ -141,6 +144,12 @@ public final class YamlConfigDocument implements ConfigDocument {
     mapping
         .getValue()
         .set(index, new NodeTuple(renamedKey(tuple.getKeyNode(), to), tuple.getValueNode()));
+  }
+
+  /** Returns the source position of the key {@code key} in {@code mapping}, or {@code null}. */
+  public static dev.leafconfig.node.SourceLocation keyLocation(MappingNode mapping, String key) {
+    int index = indexOf(mapping, key);
+    return index < 0 ? null : NodeConverter.location(mapping.getValue().get(index).getKeyNode());
   }
 
   /** Returns the index of {@code key} in {@code mapping}, or {@code -1}. */

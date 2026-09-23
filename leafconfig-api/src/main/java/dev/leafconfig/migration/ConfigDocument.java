@@ -22,10 +22,16 @@ import java.util.Optional;
  */
 public interface ConfigDocument {
 
-  /** Returns the value at {@code path}, or empty when any segment is missing. */
+  /**
+   * Returns the value at {@code path}, or empty when any segment is missing or an intermediate
+   * segment is not a mapping.
+   */
   Optional<ConfigNode> get(String path);
 
-  /** Returns {@code true} when {@code path} exists, even if its value is YAML {@code null}. */
+  /**
+   * Returns {@code true} when {@code path} exists, even if its value is YAML {@code null}. A path
+   * through a non-mapping value does not exist.
+   */
   boolean contains(String path);
 
   /**
@@ -58,8 +64,8 @@ public interface ConfigDocument {
    * becomes empty; call {@link #remove} to drop it.
    *
    * @return {@code false} when {@code from} does not exist
-   * @throws IllegalArgumentException when {@code to} already exists or a parent of {@code to} is
-   *     not a mapping
+   * @throws IllegalArgumentException when {@code to} already exists, lies inside {@code from}, or a
+   *     parent of {@code to} is not a mapping
    */
   boolean rename(String from, String to);
 

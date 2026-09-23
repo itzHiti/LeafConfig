@@ -58,13 +58,17 @@ dotted key paths (`database.host`); sequence elements cannot be addressed.
 | `set(path, value)` | replace in place (key comments and position kept, inline comment on the value kept) or append; intermediate mappings are created |
 | `setIfMissing(path, value)` | `set` only when absent; returns whether it wrote |
 | `remove(path)` | drop the entry with its comments; returns whether it removed |
-| `rename(from, to)` | move value and comments; inside one mapping the position is kept, across mappings the entry is appended to the target; fails when `to` exists |
+| `rename(from, to)` | move value and comments; inside one mapping the position is kept, across mappings the entry is appended to the target; fails when `to` exists or lies inside `from` |
 | `root()` | immutable `ConfigNode` snapshot |
 
 Values are `ConfigNode`s or plain `String`, `Boolean`, `Integer`, `Long`,
 `BigInteger`, `Float`, `Double`, `BigDecimal`, `null`. Anything else is an
 `IllegalArgumentException`. A step has no access to the file system, other
 files or the manager; it only sees its own document.
+
+Any exception a step throws, including checked exceptions from Kotlin lambdas,
+becomes a `MIGRATION_FAILED` diagnostic. Version and rename diagnostics carry
+the line of the `config-version` value or of the conflicting key.
 
 ## Simple renames without a version bump
 
