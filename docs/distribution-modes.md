@@ -14,7 +14,7 @@ Gradle (Shadow, `com.gradleup.shadow`), as used by `leafconfig-example`:
 ```kotlin
 plugins { id("com.gradleup.shadow") version "9.6.1" }
 
-dependencies { implementation("io.github.itzhiti:leafconfig-paper:0.2.1") }
+dependencies { implementation("io.github.itzhiti:leafconfig-paper:0.3.0") }
 
 tasks.shadowJar {
     relocate("dev.leafconfig", "com.example.myplugin.libs.leafconfig")
@@ -50,7 +50,7 @@ through Paper's default Central mirror (2026-09-22).
 
 ```yaml
 libraries:
-  - io.github.itzhiti:leafconfig-paper:0.2.1
+  - io.github.itzhiti:leafconfig-paper:0.3.0
 ```
 
 Paper downloads the artifact and its dependencies and adds them to the

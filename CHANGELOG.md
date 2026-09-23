@@ -7,6 +7,10 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.3.0] - 2026-09-23
+
 ### Added
 
 - `ConfigManager.load(Class, String fileName)` and
