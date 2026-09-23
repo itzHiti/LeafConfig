@@ -4,7 +4,7 @@ All annotations live in `dev.leafconfig.annotation` and have runtime retention.
 
 | Annotation | Target | Effect |
 |---|---|---|
-| `@ConfigFile(String)` | type | Required on a root type. Relative file name inside the manager base directory (`config.yml`, `messages/en.yml`). Absolute names and traversal are rejected with `UNSAFE_PATH`. |
+| `@ConfigFile(String)` | type | Default file of a root type, required for `load(Class)`. Relative file name inside the manager base directory (`config.yml`, `messages/en.yml`). Absolute names and traversal are rejected with `UNSAFE_PATH`. Types loaded only through `load(Class, String)` may omit it. |
 | `@Key(String)` | field | Overrides the generated key. Exactly one segment matching `[A-Za-z0-9_-]+`. |
 | `@Comment(String...)` | field, type | Comment lines written above a key when it is generated or when the existing key has no comment. On a root type: file header. |
 | `@Ignore` | field | Excludes the field. |

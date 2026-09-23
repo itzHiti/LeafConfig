@@ -69,16 +69,7 @@ public final class ReflectionSchemaFactory implements SchemaFactory {
   @Override
   public ConfigSchema create(Class<?> type) {
     ConfigFile file = type.getAnnotation(ConfigFile.class);
-    if (file == null) {
-      throw new ConfigModelException(
-          type,
-          List.of(
-              ConfigDiagnostic.error(
-                  ConfigPath.root(),
-                  DiagnosticCodes.INVALID_MODEL,
-                  "root configuration type must be annotated with @ConfigFile")));
-    }
-    if (file.value().isBlank()) {
+    if (file != null && file.value().isBlank()) {
       throw new ConfigModelException(
           type,
           List.of(
@@ -105,7 +96,7 @@ public final class ReflectionSchemaFactory implements SchemaFactory {
         }
       }
     }
-    return new ConfigSchema(root, file.value(), version);
+    return new ConfigSchema(root, file == null ? null : file.value(), version);
   }
 
   @Override

@@ -7,7 +7,19 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- `ConfigManager.load(Class, String fileName)` and
+  `previewMigration(Class, String fileName)`: one class can back several files,
+  for example one per locale. Each file gets its own handle; validators,
+  migrations and schema metadata are shared per class. Different spellings of
+  one file share a handle; one file cannot be loaded as two classes.
+
+### Changed
+
+- `@ConfigFile` is optional for classes that are only loaded with an explicit
+  file name. `load(Class)` on a class without it fails with `INVALID_MODEL`, as
+  before; schema discovery itself no longer rejects such classes.
 
 ## [0.2.1] - 2026-09-23
 

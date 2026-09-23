@@ -58,8 +58,9 @@ class SchemaDiscoveryTest {
   }
 
   @Test
-  void rejectsRootWithoutConfigFile() {
-    assertModelError(NoAnnotation.class, "@ConfigFile");
+  void rootWithoutConfigFileHasNoDefaultFileName() {
+    // Such types are loaded with an explicit file name; load(Class) rejects them.
+    assertThat(factory().create(NoAnnotation.class).fileName()).isNull();
   }
 
   @ConfigFile("x.yml")

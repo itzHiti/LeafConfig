@@ -132,6 +132,17 @@ ConfigHandle<MainConfig> config = manager.load(MainConfig.class);
 error) and `ConfigLoadException` for an unusable file. Both carry structured
 diagnostics; the file on disk is never modified when loading fails.
 
+One class can back several files, for example one per locale. Pass the file
+name explicitly; `@ConfigFile` is then optional:
+
+```java
+ConfigHandle<Messages> en = manager.load(Messages.class, "messages/en.yml");
+ConfigHandle<Messages> ru = manager.load(Messages.class, "messages/ru.yml");
+```
+
+Each file gets its own handle and reloads independently. Validators and
+migrations registered for the class apply to every file.
+
 ## Generated YAML
 
 On first load the file is created from the Java defaults. This is the exact
