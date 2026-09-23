@@ -16,6 +16,7 @@ import dev.leafconfig.annotation.NotBlank;
 import dev.leafconfig.annotation.Pattern;
 import dev.leafconfig.annotation.Range;
 import dev.leafconfig.annotation.Required;
+import dev.leafconfig.annotation.Secret;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InaccessibleObjectException;
@@ -307,6 +308,7 @@ public final class ReflectionSchemaFactory implements SchemaFactory {
         formerKeys,
         field.isAnnotationPresent(Required.class),
         notBlank,
+        field.isAnnotationPresent(Secret.class),
         range,
         pattern,
         new FieldAccessor(field),

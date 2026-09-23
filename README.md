@@ -198,7 +198,8 @@ Invalid configuration: plugins/Example/config.yml
 ```
 
 Every independent error is reported in one pass. Codes are stable
-(`DiagnosticCodes`), messages are not.
+(`DiagnosticCodes`), messages are not. Mark passwords and tokens with
+`@Secret`: their diagnostics keep code, path and line but never the value.
 
 ## Schema migrations
 

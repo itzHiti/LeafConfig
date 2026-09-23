@@ -10,6 +10,7 @@ import dev.leafconfig.migration.MigrationPreview;
 import dev.leafconfig.migration.Migrations;
 import dev.leafconfig.node.ConfigNode;
 import dev.leafconfig.node.MappingNode;
+import dev.leafconfig.node.ScalarNode;
 import dev.leafconfig.validation.ConfigValidator;
 import dev.leafconfig.yaml.YamlLimits;
 import dev.leafconfig.yaml.internal.codec.AdapterRegistry;
@@ -18,6 +19,7 @@ import dev.leafconfig.yaml.internal.decode.ConstraintValidator;
 import dev.leafconfig.yaml.internal.decode.Decoder;
 import dev.leafconfig.yaml.internal.decode.DiagnosticCollector;
 import dev.leafconfig.yaml.internal.decode.Encoder;
+import dev.leafconfig.yaml.internal.decode.SecretPaths;
 import dev.leafconfig.yaml.internal.io.AtomicFiles;
 import dev.leafconfig.yaml.internal.migration.MigrationRunner;
 import dev.leafconfig.yaml.internal.schema.ConfigSchema;
@@ -30,6 +32,7 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -96,13 +99,39 @@ public final class ConfigLoader {
         run.storedVersion,
         schema.version(),
         run.changed && !run.collector.hasErrors(),
-        ConfigDiff.between(before, after),
+        redact(ConfigDiff.between(before, after), run.secrets),
         run.collector.diagnostics());
+  }
+
+  private static final ScalarNode HIDDEN = ScalarNode.ofString("***");
+
+  /** Replaces the values of secret paths so a rendered diff can be logged safely. */
+  private static ConfigDiff redact(ConfigDiff diff, SecretPaths secrets) {
+    List<ConfigDiff.Change> changes = new ArrayList<>(diff.changes().size());
+    for (ConfigDiff.Change change : diff.changes()) {
+      if (secrets.test(change.path())) {
+        change =
+            new ConfigDiff.Change(
+                change.kind(),
+                change.path(),
+                change.before() == null ? null : HIDDEN,
+                change.after() == null ? null : HIDDEN);
+      }
+      changes.add(change);
+    }
+    return new ConfigDiff(changes);
   }
 
   /** Mutable state of one pipeline run; fields are filled in as far as the run gets. */
   private static final class Run {
-    final DiagnosticCollector collector = new DiagnosticCollector();
+    final SecretPaths secrets;
+    final DiagnosticCollector collector;
+
+    Run(SecretPaths secrets) {
+      this.secrets = secrets;
+      this.collector = new DiagnosticCollector(secrets);
+    }
+
     YamlDocument document;
     ConfigNode before;
     Object instance;
@@ -111,7 +140,7 @@ public final class ConfigLoader {
   }
 
   private Run process(ConfigSchema schema, Class<?> type, Path file, boolean persist) {
-    Run run = new Run();
+    Run run = new Run(new SecretPaths(schema.root(), adapters));
     DiagnosticCollector collector = run.collector;
     Object defaults = schema.root().instantiate();
     DocumentMerger merger = new DocumentMerger(new Encoder(adapters), adapters);

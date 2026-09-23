@@ -14,6 +14,10 @@ allowed and listed under **Changed**.
   for example one per locale. Each file gets its own handle; validators,
   migrations and schema metadata are shared per class. Different spellings of
   one file share a handle; one file cannot be loaded as two classes.
+- `@Secret` on a field: every diagnostic at or below it keeps code, path and
+  line, but its message is replaced, whoever produced it (built-in or user
+  adapter, annotation constraint, programmatic validator). Dry-run diffs show
+  `***` for such values. Loading and writing are unchanged.
 
 ### Changed
 

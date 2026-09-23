@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
  * @param formerKeys former keys from {@code @FormerlyKnownAs}, possibly empty
  * @param required whether {@code @Required} is present
  * @param notBlank whether {@code @NotBlank} is present
+ * @param secret whether {@code @Secret} is present
  * @param range inclusive bounds, or {@code null}
  * @param pattern compiled {@code @Pattern}, or {@code null}
  * @param accessor value accessor
@@ -29,6 +30,7 @@ public record ConfigProperty(
     List<String> formerKeys,
     boolean required,
     boolean notBlank,
+    boolean secret,
     Bounds range,
     Pattern pattern,
     PropertyAccessor accessor,

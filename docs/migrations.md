@@ -146,7 +146,8 @@ migration steps, renames, the version key and merged defaults.
 
 `ConfigDiff` compares mappings key by key; scalars, nulls and sequences are
 leaves (`~ path: before -> after`). Comments, order and quoting are not part of
-the comparison.
+the comparison. Values at or below `@Secret` keys are shown as `***`, so a
+rendered preview can be logged.
 
 ## Diagnostic codes
 
