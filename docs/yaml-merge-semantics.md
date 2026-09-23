@@ -42,6 +42,7 @@ and `expected.yml` after one load):
 | A first key that carries comments keeps its position so header comments stay on top | `unicode-crlf` |
 | Schema comments are added only to keys without a leading comment | `schema-comment-insertion` |
 | Nested sections receive missing keys recursively; `{}` becomes a block mapping | `nested-partial`, `empty-collections-and-null` |
+| Sections inside `Map<String, Section>` values and `List`/`Set` elements receive missing keys, without schema comments, flow style kept | `sections-in-collections` |
 | Indent width and indented/unindented sequences follow the file | `four-space-indent`, `unindented-sequences` |
 | CRLF and a UTF-8 BOM are preserved | `unicode-crlf` |
 | First generation writes the type-level header, a blank line, then keys | `first-generation` |
@@ -54,9 +55,9 @@ and `expected.yml` after one load):
 
 - Folded scalars (`>`) are re-folded; the value is unchanged but line breaks
   inside the scalar are not preserved.
-- Merge does not descend into `Map<String, Nested>` values or sequence
-  elements; only mapping sections that correspond to nested configuration
-  objects receive new keys.
+- Sections inside collections get missing keys but never schema comments,
+  matching freshly generated entries. Only one level of collection is
+  descended: a `Map<String, List<Section>>` is not merged into.
 - Generated files use two-space indentation, indented sequences and LF.
 
 ## Writing

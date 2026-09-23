@@ -114,7 +114,7 @@ public final class ConfigLoader {
     Run run = new Run();
     DiagnosticCollector collector = run.collector;
     Object defaults = schema.root().instantiate();
-    DocumentMerger merger = new DocumentMerger(new Encoder(adapters));
+    DocumentMerger merger = new DocumentMerger(new Encoder(adapters), adapters);
 
     boolean missing = Files.notExists(file);
     byte[] original = null;

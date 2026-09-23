@@ -7,6 +7,7 @@ import dev.leafconfig.ConfigDiagnostic;
 import dev.leafconfig.ConfigLoadException;
 import dev.leafconfig.DiagnosticCodes;
 import dev.leafconfig.yaml.testmodel.GoldenConfig;
+import dev.leafconfig.yaml.testmodel.SectionsConfig;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -67,6 +68,36 @@ class GoldenFileTest {
     }
     assertThat(new String(actual, StandardCharsets.UTF_8))
         .isEqualTo(new String(Files.readAllBytes(expected), StandardCharsets.UTF_8));
+  }
+
+  /**
+   * Fields added to a section class reach every existing map value and list element. Entries get
+   * missing keys only, never schema comments, exactly like freshly generated entries.
+   */
+  @Test
+  void sectionsInsideCollectionsReceiveMissingKeys() throws IOException {
+    Path caseDir = GOLDEN_DIR.resolve("sections-in-collections");
+    Path file = base.resolve("sections.yml");
+    Files.write(file, Files.readAllBytes(caseDir.resolve("input.yml")));
+    try (ConfigManager manager = ConfigManager.builder(base).build()) {
+      SectionsConfig config = manager.load(SectionsConfig.class).get();
+      assertThat(config.servers().get("lobby").limits().players()).isEqualTo(50);
+      assertThat(config.rewards().get(1).amount()).isEqualTo(3);
+    }
+    byte[] actual = Files.readAllBytes(file);
+    Path expected = caseDir.resolve("expected.yml");
+    if (RECORD) {
+      Files.write(expected, actual);
+    }
+    assertThat(new String(actual, StandardCharsets.UTF_8))
+        .isEqualTo(new String(Files.readAllBytes(expected), StandardCharsets.UTF_8));
+
+    // Second load: complete entries are not touched again.
+    byte[] merged = Files.readAllBytes(file);
+    try (ConfigManager manager = ConfigManager.builder(base).build()) {
+      manager.load(SectionsConfig.class);
+    }
+    assertThat(Files.readAllBytes(file)).isEqualTo(merged);
   }
 
   @Test

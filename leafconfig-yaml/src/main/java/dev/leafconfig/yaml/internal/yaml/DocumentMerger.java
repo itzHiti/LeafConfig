@@ -1,13 +1,19 @@
 package dev.leafconfig.yaml.internal.yaml;
 
+import dev.leafconfig.adapter.TypeAdapter;
+import dev.leafconfig.adapter.TypeAdapterLookup;
 import dev.leafconfig.yaml.internal.codec.ObjectAdapter;
 import dev.leafconfig.yaml.internal.decode.Encoder;
 import dev.leafconfig.yaml.internal.schema.ConfigProperty;
 import dev.leafconfig.yaml.internal.schema.ConfigSchema;
 import dev.leafconfig.yaml.internal.schema.ObjectSchema;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.snakeyaml.engine.v2.comments.CommentLine;
 import org.snakeyaml.engine.v2.comments.CommentType;
 import org.snakeyaml.engine.v2.common.FlowStyle;
@@ -16,6 +22,7 @@ import org.snakeyaml.engine.v2.nodes.MappingNode;
 import org.snakeyaml.engine.v2.nodes.Node;
 import org.snakeyaml.engine.v2.nodes.NodeTuple;
 import org.snakeyaml.engine.v2.nodes.ScalarNode;
+import org.snakeyaml.engine.v2.nodes.SequenceNode;
 import org.snakeyaml.engine.v2.nodes.Tag;
 
 /**
@@ -25,14 +32,23 @@ import org.snakeyaml.engine.v2.nodes.Tag;
  * <p>Rules: unknown keys are never removed, existing keys are never reordered or restyled, a schema
  * comment is added only to keys that have no leading comment, and a new key is placed directly
  * after its nearest preceding schema neighbour that exists in the document.
+ *
+ * <p>Sections inside a {@code Map<String, Section>} value or a {@code List}/{@code Set} of sections
+ * receive missing keys too, but never schema comments: freshly generated entries have none either,
+ * and repeating a comment in every entry would bury the administrator's own notes.
  */
 public final class DocumentMerger {
 
   private final Encoder encoder;
+  private final TypeAdapterLookup adapters;
 
-  /** Creates a merger that encodes default values with {@code encoder}. */
-  public DocumentMerger(Encoder encoder) {
+  /**
+   * Creates a merger that encodes default values with {@code encoder} and resolves collection
+   * element types with {@code adapters}.
+   */
+  public DocumentMerger(Encoder encoder, TypeAdapterLookup adapters) {
     this.encoder = encoder;
+    this.adapters = adapters;
   }
 
   /**
@@ -41,7 +57,7 @@ public final class DocumentMerger {
    * @return {@code true} when the document changed and must be written
    */
   public boolean merge(YamlDocument document, ConfigSchema schema, Object defaults) {
-    boolean changed = mergeObject(document.root(), schema.root(), defaults);
+    boolean changed = mergeObject(document.root(), schema.root(), defaults, true);
     List<String> header = schema.root().comments();
     List<NodeTuple> tuples = document.root().getValue();
     if (document.isGenerated() && !header.isEmpty() && !tuples.isEmpty()) {
@@ -58,7 +74,8 @@ public final class DocumentMerger {
     return changed;
   }
 
-  private boolean mergeObject(MappingNode mapping, ObjectSchema schema, Object defaults) {
+  private boolean mergeObject(
+      MappingNode mapping, ObjectSchema schema, Object defaults, boolean comments) {
     boolean changed = false;
     boolean wasEmpty = mapping.getValue().isEmpty();
     List<NodeTuple> tuples = mapping.getValue();
@@ -70,7 +87,9 @@ public final class DocumentMerger {
         NodeTuple tuple = tuples.get(index);
         Node keyNode = tuple.getKeyNode();
         List<CommentLine> existing = keyNode.getBlockComments();
-        if (!property.comments().isEmpty() && (existing == null || existing.isEmpty())) {
+        if (comments
+            && !property.comments().isEmpty()
+            && (existing == null || existing.isEmpty())) {
           keyNode.setBlockComments(commentLines(property.comments()));
           changed = true;
         }
@@ -80,7 +99,9 @@ public final class DocumentMerger {
           if (nestedDefaults == null) {
             nestedDefaults = nestedAdapter.schema().instantiate();
           }
-          changed |= mergeObject(nested, nestedAdapter.schema(), nestedDefaults);
+          changed |= mergeObject(nested, nestedAdapter.schema(), nestedDefaults, comments);
+        } else {
+          changed |= mergeElements(tuple.getValueNode(), property.type());
         }
         continue;
       }
@@ -89,7 +110,7 @@ public final class DocumentMerger {
       if (property.adapter() instanceof ObjectAdapter nestedAdapter && defaultValue != null) {
         // Build nested sections through the merger so their schema comments are written too.
         MappingNode nested = new MappingNode(Tag.MAP, new ArrayList<>(), FlowStyle.BLOCK);
-        mergeObject(nested, nestedAdapter.schema(), defaultValue);
+        mergeObject(nested, nestedAdapter.schema(), defaultValue, comments);
         if (nested.getValue().isEmpty()) {
           nested.setFlowStyle(FlowStyle.FLOW);
         }
@@ -98,7 +119,7 @@ public final class DocumentMerger {
         value = NodeConverter.toYaml(encoder.encodeProperty(property, defaultValue));
       }
       ScalarNode key = new ScalarNode(Tag.STR, property.key(), ScalarStyle.PLAIN);
-      if (!property.comments().isEmpty()) {
+      if (comments && !property.comments().isEmpty()) {
         key.setBlockComments(commentLines(property.comments()));
       }
       tuples.add(insertionIndex(tuples, properties, i), new NodeTuple(key, value));
@@ -106,6 +127,39 @@ public final class DocumentMerger {
     }
     if (wasEmpty && !tuples.isEmpty() && mapping.getFlowStyle() == FlowStyle.FLOW) {
       mapping.setFlowStyle(FlowStyle.BLOCK);
+    }
+    return changed;
+  }
+
+  /**
+   * Merges into every section of a {@code Map<String, Section>} value or a {@code List}/{@code Set}
+   * of sections. Entries that are not mappings are left alone; decoding has already accepted them.
+   */
+  private boolean mergeElements(Node value, Type type) {
+    if (!(type instanceof ParameterizedType parameterized)) {
+      return false;
+    }
+    Type raw = parameterized.getRawType();
+    Type[] arguments = parameterized.getActualTypeArguments();
+    List<Node> entries = new ArrayList<>();
+    if (raw == Map.class && value instanceof MappingNode map) {
+      for (NodeTuple tuple : map.getValue()) {
+        entries.add(tuple.getValueNode());
+      }
+    } else if ((raw == List.class || raw == Set.class) && value instanceof SequenceNode sequence) {
+      entries.addAll(sequence.getValue());
+    } else {
+      return false;
+    }
+    Optional<TypeAdapter<?>> element = adapters.find(arguments[arguments.length - 1]);
+    if (element.isEmpty() || !(element.get() instanceof ObjectAdapter section)) {
+      return false;
+    }
+    boolean changed = false;
+    for (Node entry : entries) {
+      if (entry instanceof MappingNode mapping) {
+        changed |= mergeObject(mapping, section.schema(), section.schema().instantiate(), false);
+      }
     }
     return changed;
   }

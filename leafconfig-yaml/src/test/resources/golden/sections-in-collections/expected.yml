@@ -1,0 +1,16 @@
+# Backend servers by name
+servers:
+  # the lobby
+  lobby:
+    host: lobby.local # inline
+    port: 25566
+    enabled: true
+    limits:
+      players: 50
+      queue: 5
+    custom: keep-me
+  survival: {host: survival.local, port: 25565, enabled: true, limits: {players: 10, queue: 5}}
+rewards:
+  - item: diamond
+    amount: 1
+  - {item: stone, amount: 3}
