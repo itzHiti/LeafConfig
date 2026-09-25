@@ -9,6 +9,10 @@ allowed and listed under **Changed**.
 
 ### Fixed
 
+- `ConfigManager.load` resolved the real path of the file twice to key its
+  handle, adding about 370 µs per load on Windows (measured with
+  `coldDiscoveryAndLoad`, see `docs/benchmarks.md`). It now reuses the real path
+  computed by the symbolic link check.
 - Documentation drift: the README configuration class lacked
   `@ConfigVersion(1)`, the README "Generated YAML" block lacked
   `config-version: 1` although it claimed to be the exact output, and the

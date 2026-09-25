@@ -18,6 +18,8 @@ jmh {
     benchmarkMode.set(listOf("avgt"))
     timeUnit.set("us")
     resultFormat.set("JSON")
+    // Allocation rate and bytes per operation next to the timings.
+    profilers.set(listOf("gc"))
 }
 
 tasks.named<JavaCompile>("compileJmhJava") {
