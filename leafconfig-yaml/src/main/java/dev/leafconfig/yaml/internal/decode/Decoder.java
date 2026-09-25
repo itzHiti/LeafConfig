@@ -62,11 +62,17 @@ public final class Decoder implements DecodeContext {
               DiagnosticCodes.MISSING_REQUIRED,
               "missing required key '" + property.key() + "'",
               mapping.source());
+        } else if (property.rawType() == Optional.class
+            && property.accessor().get(instance) == null) {
+          // A decoded instance never exposes a null Optional, even when the field default is null.
+          property.accessor().set(instance, Optional.empty());
         }
         continue;
       }
       if (child instanceof NullNode) {
-        if (property.required()) {
+        if (property.rawType() == Optional.class) {
+          property.accessor().set(instance, Optional.empty());
+        } else if (property.required()) {
           collector.error(
               childPath,
               DiagnosticCodes.MISSING_REQUIRED,

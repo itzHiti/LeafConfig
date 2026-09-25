@@ -22,7 +22,7 @@ import java.util.StringJoiner;
 /**
  * Manager-scoped adapter resolution with deterministic precedence: user exact adapters, module
  * exact adapters, built-in exact adapters, user factories, built-in factories (enums, collections,
- * maps) and finally nested configuration objects.
+ * maps, optionals) and finally nested configuration objects.
  *
  * <p>Resolved adapters are cached per type. The cache lives with the manager, so consumer classes
  * are released when the manager is closed.
@@ -54,6 +54,7 @@ public final class AdapterRegistry implements TypeAdapterLookup {
     all.add(new EnumAdapterFactory());
     all.add(new CollectionAdapterFactory());
     all.add(new MapAdapterFactory());
+    all.add(new OptionalAdapterFactory());
     this.factories = List.copyOf(all);
   }
 

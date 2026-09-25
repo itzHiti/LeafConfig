@@ -248,6 +248,7 @@ and guarantees: [docs/migrations.md](docs/migrations.md).
 | nested object | mapping | zero-argument constructor required |
 | `List<T>`, `Set<T>` | sequence | unmodifiable; set keeps document order |
 | `Map<String, T>` | mapping | unmodifiable, insertion order |
+| `Optional<T>` | value or `null` | field type only, scalar-like `T`; `null` is empty |
 | `Component` (Paper) | MiniMessage string | `leafconfig-paper` |
 | `Material`, `Particle` (Paper) | constant name | `Material` also accepts `minecraft:` keys |
 | `Sound` (Paper) | namespaced key | resolved through the server registry |

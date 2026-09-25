@@ -22,6 +22,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -250,12 +252,23 @@ public final class ReflectionSchemaFactory implements SchemaFactory {
     }
 
     Class<?> rawType = field.getType();
-    boolean charSequence = CharSequence.class.isAssignableFrom(rawType);
+    checkOptionalPlacement(field.getGenericType(), true, key, problems);
+    // Validation annotations on an Optional apply to the contained value.
+    Class<?> valueType = rawType == Optional.class ? optionalElement(field) : rawType;
+    if (rawType == Optional.class && field.isAnnotationPresent(Required.class)) {
+      problems.add(
+          invalid(
+              key,
+              "@Required contradicts Optional on field '"
+                  + name
+                  + "'; drop one of them (an empty Optional is written as null)"));
+    }
+    boolean charSequence = CharSequence.class.isAssignableFrom(valueType);
     boolean notBlank = field.isAnnotationPresent(NotBlank.class);
     if (notBlank && !charSequence) {
       problems.add(
           invalid(
-              key, "@NotBlank is only valid on CharSequence fields, found " + rawType.getName()));
+              key, "@NotBlank is only valid on CharSequence fields, found " + valueType.getName()));
     }
     Pattern patternAnnotation = field.getAnnotation(Pattern.class);
     java.util.regex.Pattern pattern = null;
@@ -263,7 +276,8 @@ public final class ReflectionSchemaFactory implements SchemaFactory {
       if (!charSequence) {
         problems.add(
             invalid(
-                key, "@Pattern is only valid on CharSequence fields, found " + rawType.getName()));
+                key,
+                "@Pattern is only valid on CharSequence fields, found " + valueType.getName()));
       } else {
         try {
           pattern = java.util.regex.Pattern.compile(patternAnnotation.value());
@@ -276,9 +290,9 @@ public final class ReflectionSchemaFactory implements SchemaFactory {
     Range rangeAnnotation = field.getAnnotation(Range.class);
     ConfigProperty.Bounds range = null;
     if (rangeAnnotation != null) {
-      if (!NUMERIC.contains(rawType)) {
+      if (!NUMERIC.contains(valueType)) {
         problems.add(
-            invalid(key, "@Range is only valid on numeric fields, found " + rawType.getName()));
+            invalid(key, "@Range is only valid on numeric fields, found " + valueType.getName()));
       } else if (rangeAnnotation.min() > rangeAnnotation.max()) {
         problems.add(invalid(key, "@Range min is greater than max"));
       } else {
@@ -287,6 +301,15 @@ public final class ReflectionSchemaFactory implements SchemaFactory {
     }
 
     Optional<TypeAdapter<?>> adapter = adapters.find(field.getGenericType());
+    if (adapter.isEmpty() && rawType == Optional.class) {
+      problems.add(
+          invalid(
+              key,
+              "Optional is supported for scalar-like values only, found "
+                  + field.getGenericType().getTypeName()
+                  + "; nested sections and collections already accept null or empty values"));
+      return null;
+    }
     if (adapter.isEmpty()) {
       problems.add(
           invalid(
@@ -313,6 +336,39 @@ public final class ReflectionSchemaFactory implements SchemaFactory {
         pattern,
         new FieldAccessor(field),
         erased);
+  }
+
+  /** Rejects {@code Optional} anywhere but as the declared type of a field. */
+  private static void checkOptionalPlacement(
+      Type type, boolean topLevel, String key, List<ConfigDiagnostic> problems) {
+    if (!(type instanceof ParameterizedType parameterized)) {
+      return;
+    }
+    if (!topLevel && parameterized.getRawType() == Optional.class) {
+      problems.add(
+          invalid(
+              key,
+              "Optional is only supported as the declared type of a field, found "
+                  + type.getTypeName()));
+      return;
+    }
+    for (Type argument : parameterized.getActualTypeArguments()) {
+      checkOptionalPlacement(argument, false, key, problems);
+    }
+  }
+
+  /** Raw class of the element of an {@code Optional} field, or {@code Object} when unknown. */
+  private static Class<?> optionalElement(Field field) {
+    if (field.getGenericType() instanceof ParameterizedType parameterized) {
+      Type element = parameterized.getActualTypeArguments()[0];
+      if (element instanceof Class<?> c) {
+        return c;
+      }
+      if (element instanceof ParameterizedType p && p.getRawType() instanceof Class<?> c) {
+        return c;
+      }
+    }
+    return Object.class;
   }
 
   private static List<String> comments(Comment comment) {

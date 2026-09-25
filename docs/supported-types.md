@@ -34,7 +34,26 @@ Declared types must be the interfaces `List`, `Set`, `Map`; raw types,
 wildcards and non-`String` map keys are model errors. A `null` element inside a
 sequence or mapping value is `NULL_NOT_ALLOWED`.
 
-`Optional<T>` is not supported yet.
+## `Optional<T>`
+
+Covered by `OptionalTest`.
+
+| YAML | Java |
+|---|---|
+| `null` | `Optional.empty()` |
+| any other value | `Optional.of(value)`, decoded by the adapter of `T` |
+| key missing | key written from the Java default, like any field |
+
+- An empty `Optional` is written as `null`. A field whose Java default is
+  `null` is still exposed as `Optional.empty()`, never as `null`.
+- `Optional` is allowed only as the declared type of a field, and only for
+  scalar-like `T` (anything with a non-section adapter, including enums,
+  `Duration`, `UUID` and Paper types). `Optional` of a nested section, `List`,
+  `Set`, `Map` or another `Optional`, and `Optional` inside a collection, are
+  model errors: those already accept `null` or an empty value.
+- `@Range`, `@Pattern` and `@NotBlank` check the contained value when present;
+  an empty `Optional` passes them. `@Required` on an `Optional` is a model
+  error.
 
 ## Paper (`leafconfig-paper`)
 

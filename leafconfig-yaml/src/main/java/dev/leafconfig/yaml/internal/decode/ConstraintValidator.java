@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Applies {@code @NotBlank}, {@code @Range} and {@code @Pattern} to a decoded instance, recursing
@@ -51,6 +52,13 @@ public final class ConstraintValidator {
       // misleading diagnostics on top of the decode error already recorded.
       if (value == null || collector.hasErrorUnder(childPath)) {
         continue;
+      }
+      // Constraints on an Optional apply to its content; an empty Optional has nothing to check.
+      if (value instanceof Optional<?> optional) {
+        if (optional.isEmpty()) {
+          continue;
+        }
+        value = optional.get();
       }
       ConfigNode child = entries.get(property.key());
       SourceLocation source = child == null ? null : child.source();

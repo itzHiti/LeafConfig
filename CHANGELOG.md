@@ -7,7 +7,13 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- `Optional<T>` fields for scalar-like `T`: YAML `null` is `Optional.empty()`,
+  an empty `Optional` is written as `null`, and a `null` field default is
+  exposed as `Optional.empty()`. `@Range`, `@Pattern` and `@NotBlank` check the
+  contained value. `Optional` of sections or collections, `Optional` inside
+  collections and `@Required` on `Optional` are model errors.
 
 ## [0.3.0] - 2026-09-23
 
