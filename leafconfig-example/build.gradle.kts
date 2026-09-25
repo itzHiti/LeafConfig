@@ -42,7 +42,7 @@ dependencies {
 }
 
 // Published LeafConfig version that the no-shade variant asks Paper to download.
-val publishedLeafConfigVersion = "0.3.0"
+val publishedLeafConfigVersion = "0.3.1"
 val minecraftVersion = libs.versions.paper.api.get().substringBefore("-")
 
 // No-shade variant: only the plugin's own classes; plugin.yml `libraries:` makes Paper resolve
