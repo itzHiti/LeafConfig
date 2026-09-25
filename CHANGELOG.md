@@ -7,7 +7,15 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- Documentation drift: the README configuration class lacked
+  `@ConfigVersion(1)`, the README "Generated YAML" block lacked
+  `config-version: 1` although it claimed to be the exact output, and the
+  validator example in `docs/annotations.md` called a method the documented
+  class did not have. Every `java` block in the README and `docs/` is now
+  compiled and compared with its source by `DocumentationSnippetsTest`; the
+  generated-YAML block is compared with the test fixture byte for byte.
 
 ## [0.3.1] - 2026-09-25
 

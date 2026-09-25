@@ -24,6 +24,9 @@ allprojects {
 spotless {
     java {
         target("*/src/**/*.java")
+        // Snippet holders repeat documentation code verbatim; DocumentationSnippetsTest keeps
+        // them identical to README and docs, so the formatter must not reflow them.
+        targetExclude("leafconfig-example/src/test/java/dev/leafconfig/example/snippets/**")
         googleJavaFormat(libs.versions.google.java.format.get())
         endWithNewline()
     }

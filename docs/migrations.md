@@ -5,6 +5,7 @@ golden fixtures under `leafconfig-yaml/src/test/resources/golden/migration`.
 
 ## Versioning a configuration
 
+<!-- snippet: illustrative -->
 ```java
 @ConfigFile("config.yml")
 @ConfigVersion(3)
@@ -27,6 +28,7 @@ A type without `@ConfigVersion` is unversioned and behaves exactly as in 0.1.x.
 
 ## Registering steps
 
+<!-- snippet: migrations-register -->
 ```java
 ConfigManager manager = ConfigManager.builder(dir)
     .migrations(MainConfig.class, m -> m
@@ -72,6 +74,7 @@ the line of the `config-version` value or of the conflicting key.
 
 ## Simple renames without a version bump
 
+<!-- snippet: migrations-formerly-known-as -->
 ```java
 @FormerlyKnownAs("motd")
 private String greeting = "Welcome!";
@@ -119,6 +122,7 @@ disables it.
 
 ## Dry run
 
+<!-- snippet: migrations-preview -->
 ```java
 MigrationPreview preview = manager.previewMigration(MainConfig.class);
 if (!preview.successful()) {

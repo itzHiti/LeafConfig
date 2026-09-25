@@ -17,6 +17,7 @@ import org.bukkit.Sound;
  * is stored as {@code config-version}; bump it and register a migration on the manager when a key
  * moves.
  */
+// snippet-start: readme-main-config
 @ConfigFile("config.yml")
 @ConfigVersion(1)
 @Comment({"LeafConfig example plugin", "Edit and run /leafconfigexample reload"})
@@ -47,6 +48,7 @@ public final class MainConfig {
   @Comment("Database connection settings")
   private Database database = new Database();
 
+  // snippet-skip: // accessors omitted
   public boolean debug() {
     return debug;
   }
@@ -79,6 +81,8 @@ public final class MainConfig {
     return database;
   }
 
+  // snippet-skip-end
+
   /** Nested section rendered as {@code database:}. */
   public static final class Database {
 
@@ -87,6 +91,8 @@ public final class MainConfig {
     @Range(min = 1, max = 65535)
     private int port = 5432;
 
+    // snippet-skip:
+
     public String host() {
       return host;
     }
@@ -94,5 +100,7 @@ public final class MainConfig {
     public int port() {
       return port;
     }
+    // snippet-skip-end
   }
 }
+// snippet-end: readme-main-config

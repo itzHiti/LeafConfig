@@ -23,6 +23,7 @@ model error, not a runtime warning.
 
 Cross-field rules use `ConfigValidator<T>` registered on the builder:
 
+<!-- snippet: annotations-validator -->
 ```java
 ConfigManager.builder(dir)
     .validator(MainConfig.class, (config, ctx) -> {

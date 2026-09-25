@@ -2,6 +2,7 @@
 
 `leafconfig-paper` is a thin layer over `leafconfig-yaml`.
 
+<!-- snippet: paper-integration-manager -->
 ```java
 ConfigManager manager = LeafConfig.forPlugin(this).build();
 ```

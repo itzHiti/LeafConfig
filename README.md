@@ -70,8 +70,10 @@ Ordinary private fields with initializers are the schema; annotations only
 adjust behavior. This is the class used by the example plugin
 ([`MainConfig.java`](leafconfig-example/src/main/java/dev/leafconfig/example/MainConfig.java)):
 
+<!-- snippet: readme-main-config -->
 ```java
 @ConfigFile("config.yml")
+@ConfigVersion(1)
 @Comment({"LeafConfig example plugin", "Edit and run /leafconfigexample reload"})
 public final class MainConfig {
 
@@ -102,7 +104,9 @@ public final class MainConfig {
 
   // accessors omitted
 
+  /** Nested section rendered as {@code database:}. */
   public static final class Database {
+
     @NotBlank private String host = "localhost";
 
     @Range(min = 1, max = 65535)
@@ -115,6 +119,7 @@ public final class MainConfig {
 
 Paper plugin:
 
+<!-- snippet: readme-load-paper -->
 ```java
 ConfigManager manager = LeafConfig.forPlugin(this).build();
 ConfigHandle<MainConfig> config = manager.load(MainConfig.class);
@@ -123,6 +128,7 @@ MainConfig current = config.get();
 
 Plain Java:
 
+<!-- snippet: readme-load-plain -->
 ```java
 ConfigManager manager = ConfigManager.builder(dataDirectory).build();
 ConfigHandle<MainConfig> config = manager.load(MainConfig.class);
@@ -135,6 +141,7 @@ diagnostics; the file on disk is never modified when loading fails.
 One class can back several files, for example one per locale. Pass the file
 name explicitly; `@ConfigFile` is then optional:
 
+<!-- snippet: readme-multi-file -->
 ```java
 ConfigHandle<Messages> en = manager.load(Messages.class, "messages/en.yml");
 ConfigHandle<Messages> ru = manager.load(Messages.class, "messages/ru.yml");
@@ -149,10 +156,11 @@ On first load the file is created from the Java defaults. This is the exact
 output for the class above, proven by
 [`MainConfigTest`](leafconfig-example/src/test/java/dev/leafconfig/example/MainConfigTest.java):
 
+<!-- snippet-file: leafconfig-example/src/test/resources/expected-config.yml -->
 ```yaml
 # LeafConfig example plugin
 # Edit and run /leafconfigexample reload
-
+config-version: 1
 # Enable verbose diagnostic messages
 debug: false
 # Maximum number of players allowed to use the reward
@@ -176,6 +184,7 @@ database:
 
 ## Reload and error handling
 
+<!-- snippet: readme-reload -->
 ```java
 ReloadResult<MainConfig> result = config.reload();
 if (!result.successful()) {
@@ -206,6 +215,7 @@ Every independent error is reported in one pass. Codes are stable
 Renaming or moving keys between plugin versions must not destroy administrator
 files. Declare a version and register sequential steps:
 
+<!-- snippet: readme-migrations -->
 ```java
 @ConfigFile("config.yml")
 @ConfigVersion(2)

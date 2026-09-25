@@ -2,6 +2,7 @@
 
 Implement `TypeAdapter<T>` from `dev.leafconfig.adapter`:
 
+<!-- snippet: adapters-color -->
 ```java
 final class ColorAdapter implements TypeAdapter<Color> {
   @Override
@@ -25,6 +26,7 @@ final class ColorAdapter implements TypeAdapter<Color> {
 
 Register it:
 
+<!-- snippet: adapters-register -->
 ```java
 ConfigManager.builder(dir).adapter(Color.class, new ColorAdapter()).build();
 ```
@@ -46,6 +48,7 @@ Rules:
 `Builder.adapter(Type, TypeAdapter<?>)` registers an adapter for a specific
 parameterized type. `TypeAdapterFactory` handles whole families:
 
+<!-- snippet: adapters-factory -->
 ```java
 ConfigManager.builder(dir)
     .adapterFactory((type, lookup) -> type == MyBox.class ? Optional.of(new MyBoxAdapter()) : Optional.empty())

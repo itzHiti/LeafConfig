@@ -28,6 +28,16 @@ When a change alters rendering, re-record with
 then review every changed `expected.yml` by hand and explain the difference in
 the commit message. Never update snapshots blindly.
 
+## Documentation snippets
+
+Every `java` block in `README.md` and `docs/` is checked by
+`DocumentationSnippetsTest` in `leafconfig-example`. Put the code in a compiled
+region (`// snippet-start: name` ... `// snippet-end: name`, usually in
+`leafconfig-example/src/test/java/dev/leafconfig/example/snippets`) and add
+`<!-- snippet: name -->` on the line above the block. A block that shows a
+generated file uses `<!-- snippet-file: path -->`; a deliberately incomplete
+fragment uses `<!-- snippet: illustrative -->`.
+
 ## Benchmarks
 
 `./gradlew :leafconfig-benchmarks:jmh` runs the JMH suite (not part of
