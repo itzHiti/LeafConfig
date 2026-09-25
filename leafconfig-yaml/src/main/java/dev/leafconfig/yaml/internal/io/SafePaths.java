@@ -23,6 +23,24 @@ public final class SafePaths {
    *     symbolic links that leave the base directory, or {@link DiagnosticCodes#IO_ERROR}
    */
   public static Path resolve(Path baseDirectory, String fileName) throws LoadFailure {
+    return locate(baseDirectory, fileName).path();
+  }
+
+  /**
+   * A resolved file name.
+   *
+   * @param path normalized absolute path inside the base directory
+   * @param realPath real path when the file exists, otherwise {@code null}; computed anyway for the
+   *     symbolic link check, so callers need not pay for another {@code toRealPath}
+   */
+  public record Location(Path path, Path realPath) {}
+
+  /**
+   * Like {@link #resolve} but also returns the real path of an existing file.
+   *
+   * @throws LoadFailure as {@link #resolve}
+   */
+  public static Location locate(Path baseDirectory, String fileName) throws LoadFailure {
     Path relative;
     try {
       relative = baseDirectory.getFileSystem().getPath(fileName);
@@ -44,12 +62,14 @@ public final class SafePaths {
       while (!Files.exists(existing, LinkOption.NOFOLLOW_LINKS)) {
         existing = existing.getParent();
       }
-      if (!existing.toRealPath().startsWith(realBase)) {
+      Path realExisting = existing.toRealPath();
+      if (!realExisting.startsWith(realBase)) {
         throw unsafe(
             "file name '"
                 + fileName
                 + "' resolves outside the base directory through a symbolic link");
       }
+      return new Location(target, existing.equals(target) ? realExisting : null);
     } catch (IOException e) {
       throw new LoadFailure(
           List.of(
@@ -58,7 +78,6 @@ public final class SafePaths {
                   DiagnosticCodes.IO_ERROR,
                   "cannot resolve '" + fileName + "': " + e)));
     }
-    return target;
   }
 
   private static LoadFailure unsafe(String message) {
