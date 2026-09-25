@@ -5,7 +5,10 @@ humans and tools alike.
 
 ## Building
 
-Requires JDK 21. Always use the wrapper:
+Requires an installed JDK 21. `JAVA_HOME` may point at an older JDK:
+`gradle/gradle-daemon-jvm.properties` makes Gradle run its daemon on Java 21,
+which Spotless needs, and Gradle finds the JDK among installed ones (for
+example `~/.jdks` or the standard install locations). Always use the wrapper:
 
 ```bash
 ./gradlew clean check                      # full quality gate: compile with -Werror, Error Prone,

@@ -9,6 +9,11 @@ allowed and listed under **Changed**.
 
 ### Fixed
 
+- Build: the Gradle daemon now always runs on Java 21
+  (`gradle/gradle-daemon-jvm.properties`). A daemon started from an older
+  `JAVA_HOME` made Spotless fail and could store that failure in the build
+  cache, breaking later builds on Java 21 as well.
+
 - `ConfigManager.load` resolved the real path of the file twice to key its
   handle, adding about 370 µs per load on Windows (measured with
   `coldDiscoveryAndLoad`, see `docs/benchmarks.md`). It now reuses the real path
