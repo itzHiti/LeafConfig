@@ -39,7 +39,7 @@ Gradle Kotlin DSL:
 
 ```kotlin
 dependencies {
-    implementation("io.github.itzhiti:leafconfig-paper:0.3.0")
+    implementation("io.github.itzhiti:leafconfig-paper:0.3.1")
 }
 ```
 
@@ -47,7 +47,7 @@ Gradle Groovy:
 
 ```groovy
 dependencies {
-    implementation 'io.github.itzhiti:leafconfig-paper:0.3.0'
+    implementation 'io.github.itzhiti:leafconfig-paper:0.3.1'
 }
 ```
 
@@ -57,7 +57,7 @@ Maven:
 <dependency>
   <groupId>io.github.itzhiti</groupId>
   <artifactId>leafconfig-paper</artifactId>
-  <version>0.3.0</version>
+  <version>0.3.1</version>
 </dependency>
 ```
 

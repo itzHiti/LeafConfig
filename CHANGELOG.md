@@ -7,6 +7,10 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.3.1] - 2026-09-25
+
 ### Added
 
 - `Optional<T>` fields for scalar-like `T`: YAML `null` is `Optional.empty()`,
