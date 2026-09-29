@@ -68,6 +68,9 @@ Checklist while the console is attached:
 6. Add an unknown key and a comment above `debug`, delete `cooldown`, reload:
    `cooldown: 5m` is re-inserted with its comment, everything else untouched.
 7. `stop`. Startup again must not rewrite the file (unchanged timestamp).
+8. Set `password: ""` under `database`, reload: expect
+   `database.password [BLANK]: details hidden because the key is marked @Secret`.
+   Added in 0.3.2; not yet run on a server.
 
 Record the Paper build number and the outcome in the compatibility table
 above.

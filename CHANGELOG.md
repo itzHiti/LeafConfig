@@ -7,6 +7,12 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
+### Changed
+
+- `leafconfig-example`: `database.password` is a `@Secret @NotBlank` field, so
+  the generated `config.yml` gains `password: change-me` and the server smoke
+  test gains a redaction check.
+
 ### Fixed
 
 - Build: the Gradle daemon now always runs on Java 21

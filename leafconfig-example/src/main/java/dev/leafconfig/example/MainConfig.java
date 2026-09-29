@@ -5,6 +5,7 @@ import dev.leafconfig.annotation.ConfigFile;
 import dev.leafconfig.annotation.ConfigVersion;
 import dev.leafconfig.annotation.NotBlank;
 import dev.leafconfig.annotation.Range;
+import dev.leafconfig.annotation.Secret;
 import java.time.Duration;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -91,6 +92,11 @@ public final class MainConfig {
     @Range(min = 1, max = 65535)
     private int port = 5432;
 
+    @Comment("Never shown in diagnostics")
+    @Secret
+    @NotBlank
+    private String password = "change-me";
+
     // snippet-skip:
 
     public String host() {
@@ -99,6 +105,10 @@ public final class MainConfig {
 
     public int port() {
       return port;
+    }
+
+    public String password() {
+      return password;
     }
     // snippet-skip-end
   }

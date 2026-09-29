@@ -20,3 +20,5 @@ enabled-worlds:
 database:
   host: localhost
   port: 5432
+  # Never shown in diagnostics
+  password: change-me

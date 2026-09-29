@@ -111,6 +111,11 @@ public final class MainConfig {
 
     @Range(min = 1, max = 65535)
     private int port = 5432;
+
+    @Comment("Never shown in diagnostics")
+    @Secret
+    @NotBlank
+    private String password = "change-me";
   }
 }
 ```
@@ -180,6 +185,8 @@ enabled-worlds:
 database:
   host: localhost
   port: 5432
+  # Never shown in diagnostics
+  password: change-me
 ```
 
 ## Reload and error handling
