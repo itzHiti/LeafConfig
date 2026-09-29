@@ -24,6 +24,10 @@ allowed and listed under **Changed**.
   handle, adding about 370 µs per load on Windows (measured with
   `coldDiscoveryAndLoad`, see `docs/benchmarks.md`). It now reuses the real path
   computed by the symbolic link check.
+- The `java` block in `docs/getting-started.md` sits inside a list and was
+  indented, so the snippet check skipped it; indented blocks are now checked
+  too. The README still said that sections inside maps and lists are not
+  merged, which is no longer true since 0.2.1.
 - Documentation drift: the README configuration class lacked
   `@ConfigVersion(1)`, the README "Generated YAML" block lacked
   `config-version: 1` although it claimed to be the exact output, and the

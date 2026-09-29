@@ -8,6 +8,7 @@
    Nested sections are nested classes with their own zero-argument constructor.
 3. In `onEnable()`:
 
+   <!-- snippet: getting-started-on-enable -->
    ```java
    manager = LeafConfig.forPlugin(this).build();
    try {

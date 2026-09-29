@@ -2,6 +2,7 @@ package dev.leafconfig.example.snippets;
 
 import dev.leafconfig.ConfigDiagnostic;
 import dev.leafconfig.ConfigHandle;
+import dev.leafconfig.ConfigLoadException;
 import dev.leafconfig.ReloadResult;
 import dev.leafconfig.example.MainConfig;
 import dev.leafconfig.paper.LeafConfig;
@@ -15,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 final class PaperSnippets extends JavaPlugin {
 
+  private ConfigManager manager;
   private ConfigHandle<MainConfig> config;
   private final Cache cache = new Cache();
 
@@ -29,6 +31,19 @@ final class PaperSnippets extends JavaPlugin {
     ConfigHandle<MainConfig> config = manager.load(MainConfig.class);
     MainConfig current = config.get();
     // snippet-end: readme-load-paper
+  }
+
+  public void onEnableWithErrorHandling() {
+    // snippet-start: getting-started-on-enable
+    manager = LeafConfig.forPlugin(this).build();
+    try {
+      config = manager.load(MainConfig.class);
+    } catch (ConfigLoadException e) {
+      getLogger().severe(e.getMessage()); // lists every problem with path and line
+      getServer().getPluginManager().disablePlugin(this);
+      return;
+    }
+    // snippet-end: getting-started-on-enable
   }
 
   void createManager() {

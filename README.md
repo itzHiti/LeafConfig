@@ -296,8 +296,9 @@ Known limitations:
 - Line breaks inside folded scalars (`>`) are re-folded by the emitter.
 - A file containing only comments keeps them verbatim above the generated
   content.
-- Sequence entries inside `Map`s or `List`s are not merged; only mapping
-  sections that correspond to nested configuration objects receive new keys.
+- Sections inside `Map` values and `List`/`Set` elements receive missing keys
+  but never schema comments, and only one collection level deep: a
+  `Map<String, List<Section>>` is not merged into.
 
 Full semantics: [docs/yaml-merge-semantics.md](docs/yaml-merge-semantics.md).
 

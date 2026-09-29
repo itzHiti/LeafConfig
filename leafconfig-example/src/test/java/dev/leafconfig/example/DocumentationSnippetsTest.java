@@ -39,7 +39,7 @@ class DocumentationSnippetsTest {
 
   private static final Path REPOSITORY = Path.of("..");
   private static final Pattern MARKER = Pattern.compile("<!-- (snippet|snippet-file): (\\S+) -->");
-  private static final Pattern FENCE = Pattern.compile("```(\\w*)");
+  private static final Pattern FENCE = Pattern.compile("(\\s*)```(\\w*)");
   private static final Pattern REGION_START = Pattern.compile("\\s*// snippet-start: (\\S+)");
   private static final Pattern REGION_END = Pattern.compile("\\s*// snippet-end: (\\S+)");
   private static final Pattern SKIP_START = Pattern.compile("(\\s*)// snippet-skip:(.*)");
@@ -123,14 +123,18 @@ class DocumentationSnippetsTest {
             target = marker.group(2);
           }
         }
+        // Blocks inside list items are indented; the fence indent is not part of the code.
+        String indent = fence.group(1);
         StringBuilder body = new StringBuilder();
         int start = i + 1;
         i++;
-        while (i < lines.size() && !lines.get(i).equals("```")) {
-          body.append(lines.get(i)).append('\n');
+        while (i < lines.size() && !lines.get(i).equals(indent + "```")) {
+          String line = lines.get(i);
+          body.append(line.startsWith(indent) ? line.substring(indent.length()) : line.strip())
+              .append('\n');
           i++;
         }
-        blocks.add(new Block(file, start, fence.group(1), kind, target, body.toString()));
+        blocks.add(new Block(file, start, fence.group(2), kind, target, body.toString()));
         i++;
       }
     }
