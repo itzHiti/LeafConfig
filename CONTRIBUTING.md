@@ -41,6 +41,9 @@ region (`// snippet-start: name` ... `// snippet-end: name`, usually in
 generated file uses `<!-- snippet-file: path -->`; a deliberately incomplete
 fragment uses `<!-- snippet: illustrative -->`.
 
+The main CI workflow skips markdown-only changes; the `Docs` workflow
+(`.github/workflows/docs.yml`) runs only this test whenever a `.md` file changes.
+
 ## Benchmarks
 
 `./gradlew :leafconfig-benchmarks:jmh` runs the JMH suite (not part of
