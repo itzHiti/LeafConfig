@@ -14,7 +14,7 @@ val publishedModules = setOf("leafconfig-api", "leafconfig-yaml", "leafconfig-pa
 
 allprojects {
     group = "io.github.itzhiti"
-    version = "0.3.2"
+    version = "0.3.3-SNAPSHOT"
 
     repositories {
         mavenCentral()
