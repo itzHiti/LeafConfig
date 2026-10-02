@@ -50,6 +50,84 @@ in any release.
 - Interfaces implemented by LeafConfig (`ConfigHandle`, `DecodeContext`,
   `EncodeContext`, `ValidationContext`) may gain abstract methods.
 
+## Versioning from 1.0.0
+
+From 1.0.0 LeafConfig follows [Semantic Versioning 2.0.0](https://semver.org/).
+The rules below say what that means for each part of the library.
+
+### Compatibility surface
+
+These are covered by the guarantees:
+
+- **Public API**: every public type and member in the public packages listed
+  above. Packages named `internal` are not covered.
+- **Annotations**: their names, targets, attributes and meaning.
+- **Serialized form**: how keys are derived from field names, how built-in and
+  Paper types are written (for example `5m` for a `Duration`, the exact enum
+  constant name), the reserved `config-version` key, and the preservation
+  guarantees in [yaml-merge-semantics.md](yaml-merge-semantics.md). A change
+  here makes plugins rewrite administrator files, so it is treated like an API
+  change.
+- **Diagnostic codes**: their names and meaning.
+- **Java baseline**: Java 21.
+
+Not covered: diagnostic messages, the text of exceptions, log output, the
+layout of a generated file beyond the guarantees above, internal packages, and
+the versions of internal dependencies such as SnakeYAML Engine.
+
+### Patch releases (1.0.x)
+
+Bug fixes only. No new public API. A fix may change behaviour that contradicted
+the documentation; the changelog says so.
+
+### Minor releases (1.x.0)
+
+Backward-compatible additions:
+
+- new public types, methods, annotations, built-in adapters and diagnostic
+  codes;
+- new `default` methods on interfaces users implement (`TypeAdapter`,
+  `TypeAdapterFactory`, `ConfigValidator`, `Migration`);
+- new abstract methods on interfaces LeafConfig implements (`ConfigHandle`,
+  `Registration`, `DecodeContext`, `EncodeContext`, `TypeAdapterLookup`,
+  `ValidationContext`, `ConfigDocument`). Implementing these outside LeafConfig
+  is not supported;
+- new record components, keeping the previous canonical constructor as an
+  overload;
+- new constants in enums that users only pass in, such as `BackupPolicy`;
+- deprecations, see below;
+- support for additional Paper versions.
+
+A minor release may drop support for an old Paper version line; the changelog
+announces it. It never does so in a patch release.
+
+### Major releases (2.0.0, ...)
+
+Everything else, in particular:
+
+- removing or changing a public type or member, including its return type;
+- new constants in enums that LeafConfig returns (`Severity`, `ScalarTag`,
+  `ConfigDiff.Kind`) and new `ConfigNode` kinds, because they break exhaustive
+  `switch` statements;
+- changing the meaning of an annotation or a diagnostic code;
+- changing the serialized form;
+- raising the Java baseline.
+
+### Deprecation
+
+An element to be removed is first marked `@Deprecated(since = "x.y")` in a minor
+release, with its replacement named in the Javadoc and in the changelog. It is
+removed no earlier than the next major release, and at least one minor release
+ships the deprecation before that.
+
+### Enforcement
+
+- `apiCompatibility` (japicmp, part of `check`) compares every published module
+  with the last release. From 1.0.0 the build refuses accepted breaks
+  (`leafconfig.apiAcceptedBreaks`) unless the major version is higher than the
+  baseline's.
+- The golden-file tests fail on any change to the serialized form.
+
 ## Invariants
 
 - No global mutable state. Caches (schemas, adapters) belong to a

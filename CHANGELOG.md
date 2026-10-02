@@ -20,6 +20,11 @@ allowed and listed under **Changed**.
   binary-incompatible changes to public packages (`*.internal.*` is excluded).
   Deliberate pre-1.0 breaks are accepted explicitly in `gradle.properties`.
 
+- Docs: the versioning policy from 1.0.0 (compatibility surface, what patch,
+  minor and major releases may change, deprecation) in
+  `docs/architecture.md`. The build enforces its API part: from 1.0.0,
+  accepted breaks are refused unless the major version grows.
+
 ### Changed
 
 - **Binary-incompatible:** `ConfigHandle.onReload(Consumer)` returns a

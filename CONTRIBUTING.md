@@ -87,7 +87,9 @@ binary-incompatible change (report in `build/reports/api-compatibility.html`).
 Before 1.0 a deliberate break is allowed when it is listed in `CHANGELOG.md`
 and its japicmp exclude pattern, such as
 `dev.leafconfig.ConfigHandle#onReload(java.util.function.Consumer)`, is added
-to `leafconfig.apiAcceptedBreaks`.
+to `leafconfig.apiAcceptedBreaks`. From 1.0.0 the build rejects accepted breaks
+unless the version's major number is higher than the baseline's; see
+"Versioning from 1.0.0" in `docs/architecture.md`.
 
 ## Pull requests
 

@@ -27,6 +27,17 @@ allprojects {
     }
 }
 
+// From 1.0.0 a binary-incompatible change needs a new major version (docs/architecture.md).
+val versionMajor = version.toString().substringBefore('.').toInt()
+check(
+    versionMajor < 1 ||
+        apiAcceptedBreaks.isBlank() ||
+        versionMajor > apiBaseline.substringBefore('.').toInt(),
+) {
+    "leafconfig.apiAcceptedBreaks must be empty: from 1.0.0 breaking changes need a new major " +
+        "version (version $version, baseline $apiBaseline)"
+}
+
 spotless {
     java {
         target("*/src/**/*.java")

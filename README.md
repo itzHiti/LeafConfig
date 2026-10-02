@@ -14,7 +14,8 @@
 
 > **Status: pre-1.0.** Public API, diagnostic codes and serialized defaults may
 > still change before `1.0.0`; every breaking change is recorded in
-> [CHANGELOG.md](CHANGELOG.md).
+> [CHANGELOG.md](CHANGELOG.md). From `1.0.0` LeafConfig follows semantic
+> versioning as defined in [docs/architecture.md](docs/architecture.md#versioning-from-100).
 
 ## Requirements
 
