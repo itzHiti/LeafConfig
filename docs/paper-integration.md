@@ -65,6 +65,13 @@ written by a newer one:
 ./gradlew :leafconfig-example:runServerLibraries -Pleafconfig.paperVersion=1.21.4
 ```
 
+PowerShell splits an unquoted `-Pname.with.dots=value` at the first dot and Gradle
+then reports a missing task such as `.paperVersion=1.21.4`; quote the argument:
+
+```powershell
+.\gradlew :leafconfig-example:runServer "-Pleafconfig.paperVersion=1.21.4"
+```
+
 Checklist while the console is attached:
 
 1. Startup log contains `Enabling LeafConfigExample v<project version>` and no stack trace.
