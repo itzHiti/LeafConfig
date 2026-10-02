@@ -127,7 +127,14 @@ class SecretTest {
                 assertThat(failure.getMessage())
                     .doesNotContain(PASSWORD)
                     .doesNotContain(TOKEN)
-                    .doesNotContain(KEY)
+                    .doesNotContain(KEY);
+                // The secret number is checked in the diagnostics only: the message header holds
+                // the temporary directory, whose random name may contain any digits.
+                String rendered =
+                    failure.diagnostics().stream()
+                        .map(ConfigDiagnostic::toString)
+                        .collect(java.util.stream.Collectors.joining("\n"));
+                assertThat(rendered)
                     .doesNotContain("55")
                     // Non-secret diagnostics keep their text.
                     .contains("expected 1..10, got 99");
