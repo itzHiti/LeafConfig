@@ -20,7 +20,7 @@ val internalPackages = "dev.leafconfig.yaml.internal.*"
 
 allprojects {
     group = "io.github.itzhiti"
-    version = "0.4.0"
+    version = "0.4.1-SNAPSHOT"
 
     repositories {
         mavenCentral()

@@ -42,7 +42,7 @@ dependencies {
 }
 
 // Published LeafConfig version that the no-shade variant asks Paper to download.
-val publishedLeafConfigVersion = "0.3.2"
+val publishedLeafConfigVersion = "0.4.0"
 val compiledMinecraftVersion = libs.versions.paper.api.get().substringBefore("-")
 // -Pleafconfig.paperVersion=1.21.4 runs the smoke tests on another Paper release. The plugin is
 // still compiled against paper-api from the catalog, exactly like a published plugin.
