@@ -22,7 +22,7 @@
 | | |
 |---|---|
 | Java | 21 |
-| Paper | 1.21.x (`paper-api` is `compileOnly`, never bundled). Built and tested against `1.21.11-R0.1-SNAPSHOT`. |
+| Paper | 1.21.x (`paper-api` is `compileOnly`, never bundled). Built against `1.21.11-R0.1-SNAPSHOT`; server smoke test passed on 1.21.1, 1.21.4 and 1.21.11, see [compatibility](docs/paper-integration.md#compatibility). |
 | YAML engine | SnakeYAML Engine (internal dependency of `leafconfig-yaml`) |
 
 `leafconfig-api` and `leafconfig-yaml` contain no Paper or Bukkit classes and

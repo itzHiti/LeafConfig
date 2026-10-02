@@ -36,12 +36,15 @@ was verified by the server smoke test below (Paper 1.21.11, 2026-09-21).
 | Paper | Compiles against | Unit tests (offline adapters) | Server smoke test |
 |---|---|---|---|
 | 1.21.11 build 132 (`paper-api:1.21.11-R0.1-SNAPSHOT`) | yes | yes | passed 2026-09-21, checklist 7/7 for both the shaded jar and the `libraries:` jar (generation, failed reload keeps snapshot and file, `Sound` via registry, invalid sound, merge of removed key, no-op restart) |
+| 1.21.4 build 232 | no, runs the jar compiled against 1.21.11 | n/a | passed 2026-10-02, checklist 8/8, shaded jar of 0.4.0-SNAPSHOT |
+| 1.21.1 build 133 | no, runs the jar compiled against 1.21.11 | n/a | passed 2026-10-02, checklist 8/8, shaded jar of 0.4.0-SNAPSHOT |
 
 Paper publishes its API only as snapshots; the version is pinned in
-`gradle/libs.versions.toml`. Other 1.21.x versions have not been compiled or
-tested; the adapters use only `Material.matchMaterial`, `Particle.values()`,
-`Registry.SOUNDS`, `NamespacedKey.fromString` and MiniMessage, which exist across
-the 1.21 line, but that is an inference, not a verified result.
+`gradle/libs.versions.toml`, and every release is compiled against that one
+version only. The rows for older servers run that same jar, as users would.
+Versions not listed (1.21, 1.21.3, 1.21.5 to 1.21.10) have not been run; that
+they work is an inference from the tested versions on both sides, not a
+verified result. The `libraries:` jar was smoke-tested on 1.21.11 only.
 
 ## Server smoke test
 

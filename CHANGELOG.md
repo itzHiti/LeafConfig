@@ -29,6 +29,9 @@ allowed and listed under **Changed**.
   and `runServerLibraries` on another Paper release, each in its own run
   directory.
 
+- Compatibility: the server smoke test passed on Paper 1.21.1 (build 133) and
+  1.21.4 (build 232) with the jar compiled against 1.21.11.
+
 ### Changed
 
 - **Binary-incompatible:** `ConfigHandle.onReload(Consumer)` returns a
