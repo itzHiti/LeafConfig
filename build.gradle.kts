@@ -12,6 +12,11 @@ plugins {
 // Library modules published to Maven Central; the example plugin and benchmarks are not.
 val publishedModules = setOf("leafconfig-api", "leafconfig-yaml", "leafconfig-paper")
 
+// API compatibility: japicmp (CLI, build-only) compares each published jar with the last release.
+val apiBaseline = providers.gradleProperty("leafconfig.apiBaseline").get()
+// Deliberate breaks accepted before 1.0, as japicmp exclude patterns separated by ';'.
+val apiAcceptedBreaks = providers.gradleProperty("leafconfig.apiAcceptedBreaks").getOrElse("")
+
 allprojects {
     group = "io.github.itzhiti"
     version = "0.4.0-SNAPSHOT"
@@ -82,6 +87,41 @@ subprojects {
                 }
             }
         }
+
+        // A detached configuration has its own root, so the module's own coordinates resolve to
+        // the released artifact instead of to the module being built.
+        val baseline =
+            configurations.detachedConfiguration(
+                dependencies.create("$group:$name:$apiBaseline@jar"),
+            ).apply { isTransitive = false }
+        val japicmpTool =
+            configurations.detachedConfiguration(
+                dependencies.create(rootProject.libs.japicmp.get()),
+            )
+        val jar = tasks.named<Jar>("jar")
+        val report = layout.buildDirectory.file("reports/api-compatibility.html")
+        val apiCompatibility =
+            tasks.register<JavaExec>("apiCompatibility") {
+                group = "verification"
+                description = "Fails on binary-incompatible changes against $apiBaseline."
+                classpath = japicmpTool
+                mainClass.set("japicmp.JApiCmp")
+                inputs.files(baseline, jar)
+                outputs.file(report)
+                argumentProviders.add(
+                    CommandLineArgumentProvider {
+                        listOf(
+                            "--old", baseline.singleFile.path,
+                            "--new", jar.get().archiveFile.get().asFile.path,
+                            "--only-incompatible",
+                            "--error-on-binary-incompatibility",
+                            "--ignore-missing-classes",
+                            "--html-file", report.get().asFile.path,
+                        ) + (if (apiAcceptedBreaks.isBlank()) listOf() else listOf("--exclude", apiAcceptedBreaks))
+                    },
+                )
+            }
+        tasks.named("check") { dependsOn(apiCompatibility) }
     } else {
         extensions.configure<JavaPluginExtension> {
             withSourcesJar()

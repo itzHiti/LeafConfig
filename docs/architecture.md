@@ -42,6 +42,9 @@ in any release.
   exhaustive `switch` statements in user adapters and is announced in the
   changelog.
 - Diagnostic codes are only ever added; existing codes keep their meaning.
+- `apiCompatibility` (japicmp, part of `check`) fails on binary-incompatible
+  changes against the last release; deliberate pre-1.0 breaks must be listed in
+  the changelog and accepted explicitly in `gradle.properties`.
 - Interfaces intended for users to implement (`TypeAdapter`,
   `TypeAdapterFactory`, `ConfigValidator`) only gain `default` methods.
 - Interfaces implemented by LeafConfig (`ConfigHandle`, `DecodeContext`,

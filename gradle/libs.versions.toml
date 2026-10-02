@@ -6,6 +6,7 @@ paper-api = "1.21.11-R0.1-SNAPSHOT"
 errorprone-core = "2.50.0"
 google-java-format = "1.36.1"
 jacoco = "0.8.15"
+japicmp = "0.26.2"
 # plugins
 errorprone-plugin = "5.1.1"
 spotless = "8.10.2"
@@ -23,6 +24,7 @@ assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 snakeyaml-engine = { module = "org.snakeyaml:snakeyaml-engine", version.ref = "snakeyaml-engine" }
 paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
 errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone-core" }
+japicmp = { module = "com.github.siom79.japicmp:japicmp", version.ref = "japicmp" }
 
 [plugins]
 errorprone = { id = "net.ltgt.errorprone", version.ref = "errorprone-plugin" }

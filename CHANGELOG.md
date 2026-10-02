@@ -7,7 +7,13 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- Build: `apiCompatibility` in every published module compares the jar with the
+  last release on Maven Central using japicmp (build-only dependency
+  `com.github.siom79.japicmp:japicmp:0.26.2`, Apache-2.0) and fails `check` on
+  binary-incompatible changes. Deliberate pre-1.0 breaks are accepted
+  explicitly in `gradle.properties`.
 
 ## [0.3.2] - 2026-09-30
 

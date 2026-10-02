@@ -66,7 +66,9 @@ accepted by the task). It is manual and not part of CI.
 3. The `Release` workflow runs `clean check` and `publishToMavenCentral`, which
    uploads a signed staging deployment to the Sonatype Central Portal. Release
    it manually there after checking the artifacts.
-4. Bump `version` to the next `-SNAPSHOT`.
+4. Bump `version` to the next `-SNAPSHOT`. Once the release is on Maven
+   Central, set `leafconfig.apiBaseline` in `gradle.properties` to it and clear
+   `leafconfig.apiAcceptedBreaks`.
 
 Required repository secrets (environment `release`): `MAVEN_CENTRAL_USERNAME`,
 `MAVEN_CENTRAL_PASSWORD` (Central Portal user token), `SIGNING_KEY_B64` (the
@@ -76,6 +78,16 @@ ASCII-armored private key, base64-encoded into a single line, for example with
 `SIGNING_KEY_PASSWORD`. Pull-request workflows never
 receive them. Locally, `./gradlew publishToMavenLocal` produces unsigned
 artifacts for testing.
+
+## API compatibility
+
+`check` runs `apiCompatibility` in every published module: japicmp compares the
+built jar with the release named by `leafconfig.apiBaseline` and fails on any
+binary-incompatible change (report in `build/reports/api-compatibility.html`).
+Before 1.0 a deliberate break is allowed when it is listed in `CHANGELOG.md`
+and its japicmp exclude pattern, such as
+`dev.leafconfig.ConfigHandle#onReload(java.util.function.Consumer)`, is added
+to `leafconfig.apiAcceptedBreaks`.
 
 ## Pull requests
 
