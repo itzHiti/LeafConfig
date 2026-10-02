@@ -25,6 +25,10 @@ allowed and listed under **Changed**.
   `docs/architecture.md`. The build enforces its API part: from 1.0.0,
   accepted breaks are refused unless the major version grows.
 
+- `leafconfig-example`: `-Pleafconfig.paperVersion=<version>` runs `runServer`
+  and `runServerLibraries` on another Paper release, each in its own run
+  directory.
+
 ### Changed
 
 - **Binary-incompatible:** `ConfigHandle.onReload(Consumer)` returns a

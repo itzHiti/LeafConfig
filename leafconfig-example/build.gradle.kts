@@ -43,7 +43,13 @@ dependencies {
 
 // Published LeafConfig version that the no-shade variant asks Paper to download.
 val publishedLeafConfigVersion = "0.3.2"
-val minecraftVersion = libs.versions.paper.api.get().substringBefore("-")
+val compiledMinecraftVersion = libs.versions.paper.api.get().substringBefore("-")
+// -Pleafconfig.paperVersion=1.21.4 runs the smoke tests on another Paper release. The plugin is
+// still compiled against paper-api from the catalog, exactly like a published plugin.
+val serverVersion = providers.gradleProperty("leafconfig.paperVersion").getOrElse(compiledMinecraftVersion)
+// An older server cannot open a world written by a newer one, so each version gets its own
+// directory; the default version keeps run/ and run-libraries/.
+val runSuffix = if (serverVersion == compiledMinecraftVersion) "" else "-$serverVersion"
 
 // No-shade variant: only the plugin's own classes; plugin.yml `libraries:` makes Paper resolve
 // leafconfig-paper and its dependencies from Maven Central at startup.
@@ -58,17 +64,19 @@ val librariesJar by tasks.registering(Jar::class) {
 // Manual smoke tests only (download a Paper server, need network):
 //   ./gradlew :leafconfig-example:runServer            shaded + relocated jar
 //   ./gradlew :leafconfig-example:runServerLibraries   no-shade jar, library from Maven Central
+// Add -Pleafconfig.paperVersion=<minecraft version> to run either on another Paper release.
 tasks.runServer {
-    minecraftVersion(minecraftVersion)
+    minecraftVersion(serverVersion)
+    runDirectory.set(layout.projectDirectory.dir("run$runSuffix"))
     jvmArgs("-Dcom.mojang.eula.agree=true")
 }
 
 tasks.register<xyz.jpenilla.runpaper.task.RunServer>("runServerLibraries") {
     group = "run paper"
     description = "Runs a Paper server with the no-shade example plugin"
-    version.set(minecraftVersion)
+    version.set(serverVersion)
     pluginJars.from(librariesJar)
-    runDirectory.set(layout.projectDirectory.dir("run-libraries"))
+    runDirectory.set(layout.projectDirectory.dir("run-libraries$runSuffix"))
     jvmArgs("-Dcom.mojang.eula.agree=true")
     // Paper resolves `libraries:` from a Google mirror of Maven Central that lags behind repo1.
     // -Pleafconfig.centralRepository=https://repo1.maven.org/maven2 points it elsewhere for testing.

@@ -53,11 +53,23 @@ example plugin installed. The EULA is accepted by the task's JVM flag.
 ./gradlew :leafconfig-example:runServer
 ```
 
+To test another Paper release, pass its Minecraft version. The plugin is still
+compiled against the `paper-api` pinned in `gradle/libs.versions.toml`, exactly
+like a published plugin, so this checks what users get on older or newer
+servers. Each version runs in its own directory, for example
+`leafconfig-example/run-1.21.4/`, because an older server cannot open a world
+written by a newer one:
+
+```bash
+./gradlew :leafconfig-example:runServer -Pleafconfig.paperVersion=1.21.4
+./gradlew :leafconfig-example:runServerLibraries -Pleafconfig.paperVersion=1.21.4
+```
+
 Checklist while the console is attached:
 
 1. Startup log contains `Enabling LeafConfigExample v<project version>` and no stack trace.
-2. `run/plugins/LeafConfigExample/config.yml` equals the generated file shown in
-   the README.
+2. `run/plugins/LeafConfigExample/config.yml` (or `run-<version>/...`) equals the
+   generated file shown in the README.
 3. Set `max-players: 500` in that file, run `leafconfigexample reload` in the
    console: expect `max-players [OUT_OF_RANGE]` and "previous configuration
    kept"; the file is not modified.
