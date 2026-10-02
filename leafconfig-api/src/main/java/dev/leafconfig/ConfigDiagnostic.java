@@ -34,11 +34,6 @@ public record ConfigDiagnostic(
     return new ConfigDiagnostic(Severity.WARNING, path, code, message, null, null);
   }
 
-  /** Returns a copy with the given source position. */
-  public ConfigDiagnostic at(Integer newLine, Integer newColumn) {
-    return new ConfigDiagnostic(severity, path, code, message, newLine, newColumn);
-  }
-
   /** Returns {@code true} for {@link Severity#ERROR}. */
   public boolean isError() {
     return severity == Severity.ERROR;

@@ -9,11 +9,29 @@ allowed and listed under **Changed**.
 
 ### Added
 
+- `ConfigManager.unload(ConfigHandle)` releases a single handle: listeners are
+  dropped, `reload()` throws and the file can be loaded again as a new handle.
+  Meant for files that come and go at runtime.
+- `Registration`, returned by `ConfigHandle.onReload`; closing it removes the
+  listener.
 - Build: `apiCompatibility` in every published module compares the jar with the
   last release on Maven Central using japicmp (build-only dependency
   `com.github.siom79.japicmp:japicmp:0.26.2`, Apache-2.0) and fails `check` on
-  binary-incompatible changes. Deliberate pre-1.0 breaks are accepted
-  explicitly in `gradle.properties`.
+  binary-incompatible changes to public packages (`*.internal.*` is excluded).
+  Deliberate pre-1.0 breaks are accepted explicitly in `gradle.properties`.
+
+### Changed
+
+- **Binary-incompatible:** `ConfigHandle.onReload(Consumer)` returns a
+  `Registration` instead of `void`, so a listener can be removed. Source that
+  ignores the result compiles unchanged; code compiled against 0.3.x must be
+  recompiled. `ConfigHandle` implementations outside LeafConfig must return a
+  `Registration`.
+
+### Removed
+
+- **Binary-incompatible:** `ConfigDiagnostic.at(Integer, Integer)`. It was not
+  used anywhere; construct a `ConfigDiagnostic` with the position instead.
 
 ## [0.3.2] - 2026-09-30
 

@@ -153,7 +153,8 @@ ConfigHandle<Messages> ru = manager.load(Messages.class, "messages/ru.yml");
 ```
 
 Each file gets its own handle and reloads independently. Validators and
-migrations registered for the class apply to every file.
+migrations registered for the class apply to every file. Release the handle of
+a file that goes away, such as a deleted arena, with `manager.unload(handle)`.
 
 ## Generated YAML
 

@@ -198,6 +198,26 @@ public final class ConfigManager implements AutoCloseable {
   }
 
   /**
+   * Releases a handle returned by this manager: it is removed from the manager, its listeners are
+   * dropped and {@link ConfigHandle#reload()} throws from now on, while {@link ConfigHandle#get()}
+   * keeps returning the last snapshot. Loading the same file again creates a new handle. Use this
+   * for files that come and go at runtime, such as one file per arena.
+   *
+   * @return {@code true} when the handle belonged to this manager and was still loaded
+   */
+  public synchronized boolean unload(ConfigHandle<?> handle) {
+    Objects.requireNonNull(handle, "handle");
+    for (Map.Entry<Path, DefaultConfigHandle<?>> entry : handles.entrySet()) {
+      if (entry.getValue() == handle) {
+        handles.remove(entry.getKey());
+        entry.getValue().close();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Runs the load pipeline for {@code type} without writing the file or publishing a snapshot and
    * reports what a real load would change: migration steps, renames, the version key and missing
    * defaults. Safe to call whether or not the type is loaded.

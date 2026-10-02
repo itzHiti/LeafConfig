@@ -27,11 +27,13 @@ class ConfigPathTest {
   @Test
   void diagnosticRenderingIncludesPathCodeAndLine() {
     ConfigDiagnostic diagnostic =
-        ConfigDiagnostic.error(
-                ConfigPath.of("database", "port"),
-                DiagnosticCodes.OUT_OF_RANGE,
-                "expected 1..65535")
-            .at(14, null);
+        new ConfigDiagnostic(
+            Severity.ERROR,
+            ConfigPath.of("database", "port"),
+            DiagnosticCodes.OUT_OF_RANGE,
+            "expected 1..65535",
+            14,
+            null);
     assertThat(diagnostic.toString())
         .isEqualTo("database.port [OUT_OF_RANGE]: expected 1..65535 (line 14)");
     assertThat(ConfigDiagnostics.render("config.yml", java.util.List.of(diagnostic)))

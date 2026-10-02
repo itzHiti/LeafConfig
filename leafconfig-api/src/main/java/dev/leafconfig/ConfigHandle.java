@@ -40,6 +40,13 @@ public interface ConfigHandle<T> {
    * Registers a listener invoked after every successful reload with the new snapshot. Listeners run
    * on the reloading thread. A listener that throws is reported as a {@link
    * DiagnosticCodes#LISTENER_FAILED} warning; it never rolls back the publication.
+   *
+   * <p>Closing the returned registration removes this listener; a reload already in progress may
+   * still call it once. Registering the same listener twice registers it twice, and each
+   * registration is removed separately. All listeners are dropped when the handle is unloaded or
+   * its manager is closed.
+   *
+   * @return a registration that removes the listener when closed
    */
-  void onReload(Consumer<? super T> listener);
+  Registration onReload(Consumer<? super T> listener);
 }

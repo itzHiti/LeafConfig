@@ -18,8 +18,14 @@
 - Listeners registered with `onReload` run on the reloading thread after
   publication. A throwing listener is reported as a `LISTENER_FAILED` warning in
   the result; it cannot roll back the publication.
-- After `ConfigManager.close()`, `get()` still works, `reload()` throws
-  `IllegalStateException`, and listeners are dropped.
+- `onReload` returns a `Registration`; `close()` on it removes that listener and
+  is idempotent. A reload already in progress may still call it once.
+- `ConfigManager.unload(handle)` releases one handle, for files that come and go
+  at runtime: its listeners are dropped, `reload()` throws and loading the file
+  again creates a new handle. It returns `false` for a handle the manager does
+  not hold.
+- After `ConfigManager.close()` or `unload`, `get()` still works, `reload()`
+  throws `IllegalStateException`, and listeners are dropped.
 
 LeafConfig creates no threads, watchers or schedulers. File I/O happens on the
 calling thread; on Paper, call `reload()` off the main thread if the file is
