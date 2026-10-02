@@ -5,6 +5,7 @@ import dev.leafconfig.node.ConfigNode;
 import dev.leafconfig.node.MappingNode;
 import dev.leafconfig.node.NullNode;
 import dev.leafconfig.node.ScalarNode;
+import dev.leafconfig.node.ScalarTag;
 import dev.leafconfig.node.SequenceNode;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -192,7 +193,7 @@ public record ConfigDiff(List<Change> changes) {
 
   private static String render(ConfigNode node) {
     if (node instanceof ScalarNode scalar) {
-      return scalar.tag() == dev.leafconfig.node.ScalarTag.STRING
+      return scalar.tag() == ScalarTag.STRING
           ? "\"" + scalar.value().replace("\"", "\\\"") + "\""
           : scalar.value();
     }

@@ -2,6 +2,7 @@ package dev.leafconfig.yaml;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.groups.Tuple.tuple;
 
 import dev.leafconfig.ConfigDiagnostic;
 import dev.leafconfig.ConfigLoadException;
@@ -112,12 +113,9 @@ class OptionalTest {
                   assertThat(((ConfigLoadException) e).diagnostics())
                       .extracting(d -> d.path().toString(), ConfigDiagnostic::code)
                       .containsExactlyInAnyOrder(
-                          org.assertj.core.groups.Tuple.tuple(
-                              "limit", DiagnosticCodes.OUT_OF_RANGE),
-                          org.assertj.core.groups.Tuple.tuple(
-                              "code", DiagnosticCodes.PATTERN_MISMATCH),
-                          org.assertj.core.groups.Tuple.tuple(
-                              "timeout", DiagnosticCodes.INVALID_VALUE)));
+                          tuple("limit", DiagnosticCodes.OUT_OF_RANGE),
+                          tuple("code", DiagnosticCodes.PATTERN_MISMATCH),
+                          tuple("timeout", DiagnosticCodes.INVALID_VALUE)));
     }
     // Empty values pass every constraint.
     Files.writeString(file(), "limit: null\ncode: null\n");

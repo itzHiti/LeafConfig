@@ -28,6 +28,7 @@ import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
@@ -340,7 +341,7 @@ class ConfigManagerTest {
       new TypeAdapter<>() {
         @Override
         public String decode(ConfigNode node, DecodeContext context) {
-          return ((ScalarNode) node).value().toUpperCase(java.util.Locale.ROOT);
+          return ((ScalarNode) node).value().toUpperCase(Locale.ROOT);
         }
 
         @Override

@@ -8,6 +8,7 @@ import dev.leafconfig.adapter.ConfigDecodeException;
 import dev.leafconfig.adapter.TypeAdapter;
 import dev.leafconfig.node.ConfigNode;
 import dev.leafconfig.node.MappingNode;
+import dev.leafconfig.node.NullNode;
 import dev.leafconfig.node.ScalarNode;
 import dev.leafconfig.node.ScalarTag;
 import dev.leafconfig.node.SequenceNode;
@@ -19,9 +20,12 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -229,19 +233,19 @@ class BuiltinAdaptersTest {
                     scalar("a", ScalarTag.STRING),
                     scalar("b", ScalarTag.STRING))));
     assertThat(decoded)
-        .asInstanceOf(org.assertj.core.api.InstanceOfAssertFactories.COLLECTION)
+        .asInstanceOf(InstanceOfAssertFactories.COLLECTION)
         .containsExactly("b", "a");
   }
 
   @Test
   void mapsRequireStringKeysAndKeepOrder() throws Exception {
     Type mapType = TypeTokens.class.getDeclaredField("limits").getGenericType();
-    Map<String, ConfigNode> entries = new java.util.LinkedHashMap<>();
+    Map<String, ConfigNode> entries = new LinkedHashMap<>();
     entries.put("z", scalar("1", ScalarTag.INTEGER));
     entries.put("a", scalar("2", ScalarTag.INTEGER));
     Object decoded = decode(mapType, MappingNode.of(entries));
     assertThat(decoded)
-        .asInstanceOf(org.assertj.core.api.InstanceOfAssertFactories.MAP)
+        .asInstanceOf(InstanceOfAssertFactories.MAP)
         .containsExactly(Map.entry("z", 1), Map.entry("a", 2));
     assertThat(failCode(mapType, SequenceNode.of(List.of())))
         .isEqualTo(DiagnosticCodes.TYPE_MISMATCH);
@@ -251,7 +255,7 @@ class BuiltinAdaptersTest {
   @Test
   void nullElementsInsideCollectionsAreErrors() throws Exception {
     Type listOfInt = TypeTokens.class.getDeclaredField("ints").getGenericType();
-    decode(listOfInt, SequenceNode.of(List.of(dev.leafconfig.node.NullNode.instance())));
+    decode(listOfInt, SequenceNode.of(List.of(NullNode.instance())));
     assertThat(collector.diagnostics())
         .singleElement()
         .satisfies(d -> assertThat(d.code()).isEqualTo(DiagnosticCodes.NULL_NOT_ALLOWED));
@@ -260,7 +264,7 @@ class BuiltinAdaptersTest {
   @SuppressWarnings("unused")
   static final class TypeTokens {
     List<Integer> ints;
-    java.util.Set<String> names;
+    Set<String> names;
     Map<String, Integer> limits;
     Map<Integer, String> byId;
   }

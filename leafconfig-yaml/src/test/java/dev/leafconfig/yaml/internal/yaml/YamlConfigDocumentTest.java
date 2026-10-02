@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import dev.leafconfig.node.MappingNode;
 import dev.leafconfig.node.NullNode;
 import dev.leafconfig.node.ScalarNode;
+import dev.leafconfig.node.ScalarTag;
 import dev.leafconfig.yaml.YamlLimits;
 import dev.leafconfig.yaml.internal.decode.DiagnosticCollector;
 import java.math.BigDecimal;
@@ -135,11 +136,7 @@ class YamlConfigDocumentTest {
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("unsupported value type");
     assertThat(editable.get("a"))
-        .contains(
-            new ScalarNode(
-                "1",
-                dev.leafconfig.node.ScalarTag.INTEGER,
-                editable.get("a").orElseThrow().source()));
+        .contains(new ScalarNode("1", ScalarTag.INTEGER, editable.get("a").orElseThrow().source()));
     editable.set("n", new NullNode(null));
     editable.set("m", MappingNode.of(Map.of("k", ScalarNode.ofString("v"))));
     assertThat(editable.get("m.k")).contains(ScalarNode.ofString("v"));

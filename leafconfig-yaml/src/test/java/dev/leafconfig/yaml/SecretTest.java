@@ -2,6 +2,7 @@ package dev.leafconfig.yaml;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.groups.Tuple.tuple;
 
 import dev.leafconfig.ConfigDiagnostic;
 import dev.leafconfig.ConfigLoadException;
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -133,7 +135,7 @@ class SecretTest {
                 String rendered =
                     failure.diagnostics().stream()
                         .map(ConfigDiagnostic::toString)
-                        .collect(java.util.stream.Collectors.joining("\n"));
+                        .collect(Collectors.joining("\n"));
                 assertThat(rendered)
                     .doesNotContain("55")
                     // Non-secret diagnostics keep their text.
@@ -142,18 +144,12 @@ class SecretTest {
                 assertThat(diagnostics)
                     .extracting(d -> d.path().toString(), ConfigDiagnostic::code)
                     .containsExactlyInAnyOrder(
-                        org.assertj.core.groups.Tuple.tuple(
-                            "password", DiagnosticCodes.PATTERN_MISMATCH),
-                        org.assertj.core.groups.Tuple.tuple(
-                            "visible", DiagnosticCodes.OUT_OF_RANGE),
-                        org.assertj.core.groups.Tuple.tuple(
-                            "credentials.level", DiagnosticCodes.OUT_OF_RANGE),
-                        org.assertj.core.groups.Tuple.tuple(
-                            "servers.main.token", DiagnosticCodes.PATTERN_MISMATCH),
-                        org.assertj.core.groups.Tuple.tuple(
-                            "pins[0]", DiagnosticCodes.INVALID_VALUE),
-                        org.assertj.core.groups.Tuple.tuple(
-                            "api-key", DiagnosticCodes.INVALID_VALUE));
+                        tuple("password", DiagnosticCodes.PATTERN_MISMATCH),
+                        tuple("visible", DiagnosticCodes.OUT_OF_RANGE),
+                        tuple("credentials.level", DiagnosticCodes.OUT_OF_RANGE),
+                        tuple("servers.main.token", DiagnosticCodes.PATTERN_MISMATCH),
+                        tuple("pins[0]", DiagnosticCodes.INVALID_VALUE),
+                        tuple("api-key", DiagnosticCodes.INVALID_VALUE));
                 assertThat(diagnostics)
                     .filteredOn(d -> !d.path().toString().equals("visible"))
                     .allSatisfy(

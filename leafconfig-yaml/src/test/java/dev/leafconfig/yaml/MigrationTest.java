@@ -13,6 +13,7 @@ import dev.leafconfig.ReloadResult;
 import dev.leafconfig.annotation.ConfigFile;
 import dev.leafconfig.annotation.ConfigVersion;
 import dev.leafconfig.annotation.FormerlyKnownAs;
+import dev.leafconfig.annotation.Key;
 import dev.leafconfig.migration.BackupPolicy;
 import dev.leafconfig.migration.ConfigDiff;
 import dev.leafconfig.migration.MigrationPreview;
@@ -406,7 +407,7 @@ class MigrationTest {
   @ConfigFile("reserved.yml")
   @ConfigVersion(1)
   static final class ReservedKey {
-    @dev.leafconfig.annotation.Key("config-version")
+    @Key("config-version")
     private int value = 1;
   }
 

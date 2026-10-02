@@ -1,9 +1,11 @@
 package dev.leafconfig.yaml.internal.yaml;
 
+import dev.leafconfig.ConfigPath;
 import dev.leafconfig.migration.ConfigDocument;
 import dev.leafconfig.node.ConfigNode;
 import dev.leafconfig.node.NullNode;
 import dev.leafconfig.node.ScalarNode;
+import dev.leafconfig.node.SourceLocation;
 import dev.leafconfig.yaml.YamlLimits;
 import dev.leafconfig.yaml.internal.decode.DiagnosticCollector;
 import java.math.BigDecimal;
@@ -41,7 +43,7 @@ public final class YamlConfigDocument implements ConfigDocument {
     }
     return Optional.of(
         new NodeConverter(limits, new DiagnosticCollector())
-            .toConfigNode(tuple.getValueNode(), dev.leafconfig.ConfigPath.of(split(path)), 0));
+            .toConfigNode(tuple.getValueNode(), ConfigPath.of(split(path)), 0));
   }
 
   @Override
@@ -131,7 +133,7 @@ public final class YamlConfigDocument implements ConfigDocument {
   @Override
   public ConfigNode root() {
     return new NodeConverter(limits, new DiagnosticCollector())
-        .toConfigNode(root, dev.leafconfig.ConfigPath.root(), 0);
+        .toConfigNode(root, ConfigPath.root(), 0);
   }
 
   /**
@@ -147,7 +149,7 @@ public final class YamlConfigDocument implements ConfigDocument {
   }
 
   /** Returns the source position of the key {@code key} in {@code mapping}, or {@code null}. */
-  public static dev.leafconfig.node.SourceLocation keyLocation(MappingNode mapping, String key) {
+  public static SourceLocation keyLocation(MappingNode mapping, String key) {
     int index = indexOf(mapping, key);
     return index < 0 ? null : NodeConverter.location(mapping.getValue().get(index).getKeyNode());
   }

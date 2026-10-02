@@ -2,6 +2,7 @@ package dev.leafconfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class ConfigPathTest {
@@ -36,7 +37,7 @@ class ConfigPathTest {
             null);
     assertThat(diagnostic.toString())
         .isEqualTo("database.port [OUT_OF_RANGE]: expected 1..65535 (line 14)");
-    assertThat(ConfigDiagnostics.render("config.yml", java.util.List.of(diagnostic)))
+    assertThat(ConfigDiagnostics.render("config.yml", List.of(diagnostic)))
         .startsWith("Invalid configuration: config.yml")
         .contains("  - database.port [OUT_OF_RANGE]");
   }
