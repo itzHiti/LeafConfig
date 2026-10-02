@@ -7,6 +7,10 @@ allowed and listed under **Changed**.
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.4.0] - 2026-10-02
+
 ### Added
 
 - `ConfigManager.unload(ConfigHandle)` releases a single handle: listeners are
@@ -29,8 +33,9 @@ allowed and listed under **Changed**.
   and `runServerLibraries` on another Paper release, each in its own run
   directory.
 
-- Compatibility: the server smoke test passed on Paper 1.21.1 (build 133) and
-  1.21.4 (build 232) with the jar compiled against 1.21.11.
+- Compatibility: the server smoke test passed on Paper 1.21.1 (build 133),
+  1.21.4 (build 232) and 1.21.8 (build 60) with the jar compiled against
+  1.21.11.
 
 ### Changed
 
