@@ -16,6 +16,7 @@ val publishedModules = setOf("leafconfig-api", "leafconfig-yaml", "leafconfig-pa
 val apiBaseline = providers.gradleProperty("leafconfig.apiBaseline").get()
 // Deliberate breaks accepted before 1.0, as japicmp exclude patterns separated by ';'.
 val apiAcceptedBreaks = providers.gradleProperty("leafconfig.apiAcceptedBreaks").getOrElse("")
+val internalPackages = "dev.leafconfig.yaml.internal.*"
 
 allprojects {
     group = "io.github.itzhiti"
@@ -107,6 +108,7 @@ subprojects {
                 classpath = japicmpTool
                 mainClass.set("japicmp.JApiCmp")
                 inputs.files(baseline, jar)
+                inputs.property("excludes", listOf(internalPackages, apiAcceptedBreaks))
                 outputs.file(report)
                 argumentProviders.add(
                     CommandLineArgumentProvider {
@@ -116,8 +118,11 @@ subprojects {
                             "--only-incompatible",
                             "--error-on-binary-incompatibility",
                             "--ignore-missing-classes",
+                            // Implementation packages may change in any release; deliberate
+                            // pre-1.0 breaks are accepted by name. One flag, ';'-separated.
+                            "--exclude", listOf(internalPackages, apiAcceptedBreaks).filter { it.isNotBlank() }.joinToString(";"),
                             "--html-file", report.get().asFile.path,
-                        ) + (if (apiAcceptedBreaks.isBlank()) listOf() else listOf("--exclude", apiAcceptedBreaks))
+                        )
                     },
                 )
             }
